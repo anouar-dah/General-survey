@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استبيان — منصة الاستبيانات</title>
+<meta name="description" content="منصة استبيانات علمية عامة للباحثين والطلبة والأكاديميين">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb;--bg2:#ffffff;--bg3:#f0f2f8;--bg4:#e5e8f0;
+  --border:#e2e5ef;--border2:#c8cde0;
+  --text:#1a1d2e;--text2:#4a5068;--text3:#8a90a8;
+  --accent:#3b6ff0;--accent2:#2557d6;
+  --green:#16a34a;--green2:#15803d;
+  --amber:#d97706;--red:#dc2626;
+  --purple:#7c3aed;--teal:#0891b2;
+  --shadow:0 2px 16px rgba(30,40,80,.08);
+  --shadow2:0 8px 32px rgba(30,40,80,.14);
+  --radius:16px;--radius2:10px;--radius3:8px;
+  --header-h:64px;
+}
+[data-theme="dark"]{
+  --bg:#0d1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d40;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --text:#e8edf8;--text2:#9aa3bc;--text3:#555f78;
+  --shadow:0 2px 16px rgba(0,0,0,.4);--shadow2:0 8px 32px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(59,111,240,.35)}50%{box-shadow:0 0 0 10px rgba(59,111,240,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(.85);opacity:0}80%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+@keyframes checkmark{0%{stroke-dashoffset:30}100%{stroke-dashoffset:0}}
+@keyframes confetti{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(120px) rotate(720deg);opacity:0}}
+@keyframes glow{0%,100%{opacity:.6}50%{opacity:1}}
+
+.site-header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:var(--header-h);
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;transition:background .3s;
+}
+[data-theme="dark"] .site-header{background:rgba(13,17,23,.88)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+.logo-sub{font-size:10px;color:var(--text3);font-weight:400}
+.header-actions{display:flex;align-items:center;gap:10px}
+.theme-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border2);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s;color:var(--text2)}
+.theme-btn:hover{border-color:var(--accent);background:var(--bg2)}
+
+.hero{
+  padding-top:calc(var(--header-h) + 4rem);
+  padding-bottom:3rem;
+  text-align:center;
+  max-width:780px;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem;
+  animation:fadeUp .7s ease both;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,rgba(59,111,240,.1),rgba(124,58,237,.1));
+  border:1px solid rgba(59,111,240,.2);
+  border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;
+  color:var(--accent);margin-bottom:1.5rem;
+}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:glow 2s infinite;display:inline-block}
+.hero h1{font-family:'Cairo',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:900;line-height:1.3;color:var(--text);margin-bottom:.75rem}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:15px;color:var(--text2);line-height:1.8;max-width:600px;margin:0 auto 2rem}
+.hero-stats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:2rem}
+.hero-stat{text-align:center}
+.hero-stat .val{font-family:'Cairo',sans-serif;font-size:22px;font-weight:800;color:var(--accent)}
+.hero-stat .lbl{font-size:11px;color:var(--text3);font-weight:500;margin-top:2px}
+.time-est{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:12px;color:var(--text2)}
+
+.sticky-progress{
+  position:sticky;top:var(--header-h);z-index:90;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:10px 2rem;transition:all .3s;
+}
+.progress-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.progress-label{font-size:12px;color:var(--text2);font-weight:600;white-space:nowrap}
+.progress-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.progress-pct{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;min-width:32px}
+.step-dots{display:flex;gap:5px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--bg4);border:2px solid var(--border2);transition:.3s;cursor:pointer}
+.step-dot.done{background:var(--green);border-color:var(--green)}
+.step-dot.active{background:var(--accent);border-color:var(--accent);animation:pulse 2s infinite}
+
+.form-wrap{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.section-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem;box-shadow:var(--shadow);animation:fadeUp .4s ease both;transition:border-color .2s,box-shadow .2s}
+.section-card:hover{box-shadow:var(--shadow2)}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.section-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.si-0{background:rgba(59,111,240,.1)}
+.si-1{background:rgba(22,163,74,.1)}
+.si-2{background:rgba(217,119,6,.1)}
+.si-3{background:rgba(124,58,237,.1)}
+.si-4{background:rgba(8,145,178,.1)}
+.si-5{background:rgba(220,38,38,.1)}
+.section-meta h2{font-family:'Cairo',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px}
+.section-meta p{font-size:12px;color:var(--text3)}
+
+/* Personal fields */
+.field-group{margin-bottom:1.5rem}
+.field-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.field-label .req{color:var(--red);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:20px;border:2px solid var(--border2);background:var(--bg3);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;color:var(--text2);font-weight:500;transition:all .2s;user-select:none}
+.chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+.chip.selected{background:linear-gradient(135deg,rgba(59,111,240,.12),rgba(124,58,237,.08));border-color:var(--accent);color:var(--accent);font-weight:600;box-shadow:0 0 0 3px rgba(59,111,240,.08)}
+.chip.selected::before{content:'✓';font-size:12px;font-weight:700}
+.chip-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:.2s;flex-shrink:0}
+.chip.selected .chip-dot{background:var(--accent)}
+/* Text/number input */
+.text-inp{width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--radius3);font-family:'Tajawal',sans-serif;font-size:13px;color:var(--text);background:var(--bg3);outline:none;transition:.2s;direction:rtl}
+.text-inp:focus{border-color:var(--accent);background:var(--bg2);box-shadow:0 0 0 3px rgba(59,111,240,.08)}
+
+/* Likert */
+.dim-title{font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin:1.5rem 0 .75rem;padding:6px 10px;background:var(--bg3);border-radius:6px;border-right:3px solid var(--accent)}
+.q-item{border:1.5px solid var(--border);border-radius:var(--radius2);padding:1.25rem;margin-bottom:10px;background:var(--bg2);transition:all .2s}
+.q-item:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.q-item.answered{border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.02)}
+.q-item.error{border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.02)}
+.q-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.q-badge{min-width:28px;height:28px;border-radius:7px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text3);flex-shrink:0}
+.q-item.answered .q-badge{background:rgba(22,163,74,.15);color:var(--green)}
+.q-text{font-size:13.5px;color:var(--text2);line-height:1.65;flex:1}
+.likert-row{display:grid;gap:6px}
+.likert-row.l5{grid-template-columns:repeat(5,1fr)}
+.likert-row.l7{grid-template-columns:repeat(7,1fr)}
+.likert-opt{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px 4px;border-radius:8px;transition:all .2s}
+.likert-opt input{display:none}
+.likert-opt:hover .likert-circle{transform:scale(1.1)}
+.likert-circle{width:40px;height:40px;border-radius:50%;border:2.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text3);transition:all .25s}
+.likert-opt:hover .likert-circle{border-color:var(--border2);background:var(--bg4)}
+.likert-lbl{font-size:10px;color:var(--text3);text-align:center;line-height:1.3;font-weight:500}
+.likert-opt.selected .likert-circle{color:#fff;transform:scale(1.15);animation:pop .3s}
+.likert-opt.lh.selected .likert-circle{background:#16a34a;border-color:#16a34a;box-shadow:0 0 16px rgba(22,163,74,.35)}
+.likert-opt.lm.selected .likert-circle{background:#64748b;border-color:#64748b}
+.likert-opt.ll.selected .likert-circle{background:#dc2626;border-color:#dc2626;box-shadow:0 0 16px rgba(220,38,38,.3)}
+.q-progress-bar{height:3px;background:var(--bg4);border-radius:2px;margin-top:10px;overflow:hidden}
+.q-progress-fill{height:100%;border-radius:2px;transition:width .4s,background .4s}
+/* Single / Multi select in questionnaire */
+.mcq-opts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.mcq-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--radius3);cursor:pointer;transition:.2s;font-size:13px;color:var(--text2)}
+.mcq-opt:hover{border-color:var(--accent);background:rgba(59,111,240,.04)}
+.mcq-opt.selected{border-color:var(--accent);background:rgba(59,111,240,.08);color:var(--accent);font-weight:600}
+.mcq-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s;font-size:10px}
+.mcq-opt.selected .mcq-check{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Navigation */
+.nav-btns{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 2rem;max-width:860px;margin:0 auto;background:var(--bg2);border-top:1px solid var(--border);position:sticky;bottom:0;z-index:80}
+.btn{padding:11px 24px;border-radius:var(--radius2);border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 14px rgba(59,111,240,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(59,111,240,.4)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-success{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 4px 14px rgba(22,163,74,.3)}
+.btn-success:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+/* Success */
+.success-screen{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;min-height:60vh;animation:fadeUp .6s ease}
+.success-screen.show{display:flex}
+.success-icon{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,rgba(22,163,74,.15),rgba(16,185,129,.1));display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}
+.success-icon svg{width:50px;height:50px}
+.checkmark-path{stroke:#16a34a;stroke-width:2.5;fill:none;stroke-dasharray:30;stroke-dashoffset:30;animation:checkmark .6s .4s ease forwards}
+.success-screen h2{font-family:'Cairo',sans-serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:.75rem}
+.success-screen p{font-size:15px;color:var(--text2);line-height:1.8;max-width:500px}
+.confetti-container{position:fixed;top:0;left:0;right:0;pointer-events:none;z-index:200}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confetti 2s ease forwards}
+
+/* Validation */
+.val-banner{background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius2);padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:1rem;display:none;animation:fadeUp .3s}
+.val-banner.show{display:flex;align-items:center;gap:8px}
+
+/* Closed / Loading */
+.status-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;min-height:70vh}
+.status-screen h2{font-family:'Cairo',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-bottom:.75rem}
+.status-screen p{font-size:14px;color:var(--text3);max-width:480px;margin:0 auto}
+
+@media(max-width:640px){
+  .site-header{padding:0 1rem}
+  .hero{padding-top:calc(var(--header-h) + 2rem)}
+  .likert-row.l5{grid-template-columns:repeat(5,1fr);gap:3px}
+  .likert-row.l7{grid-template-columns:repeat(7,1fr);gap:2px}
+  .likert-circle{width:34px;height:34px;font-size:12px}
+  .likert-lbl{font-size:9px}
+  .section-card{padding:1.25rem}
+  .nav-btns{padding:1rem}
+  .hero-stats{gap:1.25rem}
+}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="confetti-container" id="confetti"></div>
+
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-icon">🎓</div>
+    <div class="logo-text" id="site-title">
+      منصة الاستبيانات
+      <div class="logo-sub" id="site-sub">استبيان علمي</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل الوضع">🌙</button>
+  </div>
+</header>
+
+<div class="sticky-progress" id="sticky-progress" style="display:none">
+  <div class="progress-inner">
+    <div class="step-dots" id="step-dots"></div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <span class="progress-pct" id="prog-pct">0%</span>
+  </div>
+</div>
+
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">
+    <svg viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="24" fill="none" stroke="rgba(22,163,74,.2)" stroke-width="2"/>
+      <path class="checkmark-path" d="M14 27l8 8 16-16"/>
+    </svg>
+  </div>
+  <h2>شكراً لمشاركتك! 🎉</h2>
+  <p id="success-msg">تم تسجيل إجاباتك بنجاح. مساهمتك في هذه الدراسة العلمية ستساعد الباحثين.</p>
+  <div style="margin-top:2rem;padding:1.25rem 2rem;background:var(--bg3);border-radius:var(--radius2);border:1px solid var(--border);font-size:13px;color:var(--text2)">
+    🔒 إجاباتك محفوظة بشكل آمن وستُستخدم لأغراض علمية فقط
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="hero" id="hero-section" style="display:none">
+  <div class="hero-badge">📋 استبيان علمي</div>
+  <h1 id="hero-title">جارٍ تحميل الاستبيان...</h1>
+  <p id="hero-desc">يرجى الانتظار...</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val" id="hs-axes">—</div><div class="lbl">محاور</div></div>
+    <div class="hero-stat"><div class="val" id="hs-dims">—</div><div class="lbl">أبعاد</div></div>
+    <div class="hero-stat"><div class="val" id="hs-qs">—</div><div class="lbl">سؤال</div></div>
+  </div>
+  <div class="time-est">⏱ الوقت المتوقع: <span id="hs-time">دقائق</span></div>
+</div>
+
+<!-- Loading -->
+<div class="status-screen" id="loading-screen">
+  <div style="font-size:48px;margin-bottom:1rem">⏳</div>
+  <h2>جارٍ تحميل الاستبيان...</h2>
+  <p>يرجى الانتظار</p>
+</div>
+
+<!-- Closed -->
+<div class="status-screen" id="closed-screen" style="display:none">
+  <div style="font-size:48px;margin-bottom:1rem">🔒</div>
+  <h2>الاستبيان مغلق</h2>
+  <p>عذراً، انتهت فترة تقديم الاستبيان أو أنه لم يُفتح بعد.</p>
+</div>
+
+<!-- Survey Form -->
+<div id="survey-form" style="display:none">
+  <div class="form-wrap">
+    <div class="val-banner" id="val-banner">⚠️ يرجى الإجابة على جميع الأسئلة الإلزامية قبل المتابعة.</div>
+    <div id="sections-container"></div>
+  </div>
+</div>
+<div class="nav-btns" id="nav-btns" style="display:none">
+  <button class="btn btn-ghost" id="btn-prev" onclick="prevStep()" style="display:none">→ السابق</button>
+  <div style="font-size:12px;color:var(--text3)">الخطوة <span id="step-num">1</span> من <span id="step-total">1</span></div>
+  <button class="btn btn-primary" id="btn-next" onclick="nextStep()">التالي ←</button>
+</div>
+
+<script type="module">
+// ═══════════════════════════════════════
+//  FIREBASE (optional — graceful fallback)
+// ═══════════════════════════════════════
+let db = null;
+async function initFirebase() {
+  const cfg = localStorage.getItem('firebase_config');
+  if (!cfg) return;
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const { getDatabase, ref, push, set, get, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+    const app = initializeApp(JSON.parse(cfg), 'survey-app-' + Math.random());
+    const database = getDatabase(app);
+    db = { ref, push, set, get, onValue, db: database };
+    // Load survey from firebase if not in localStorage
+    const surveySnap = await get(ref(database, 'survey'));
+    if (surveySnap.exists()) {
+      const fb = surveySnap.val();
+      if (fb && fb.title) {
+        localStorage.setItem('survey_config', JSON.stringify(fb));
+      }
+    }
+  } catch(e) { console.warn('Firebase init failed:', e); }
+}
+
+// ═══════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════
+function initTheme(){
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const h = new Date().getHours();
+  const theme = stored || ((h < 6 || h >= 20 || prefersDark) ? 'dark' : 'light');
+  setTheme(theme);
+}
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-btn').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', t);
+}
+window.toggleTheme = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+};
+
+// ═══════════════════════════════════════
+//  SURVEY DATA
+// ═══════════════════════════════════════
+let survey = null;
+let currentStep = 0;
+let answers = { info: {}, q: {} };
+let startTime = Date.now();
+let STEPS = [];
+
+// Likert labels
+const LIKERT5_L = ['أوافق بشدة','أوافق','محايد','لا أوافق','لا أوافق بشدة'];
+const LIKERT7_L = ['أوافق بشدة','أوافق','أوافق نوعاً ما','محايد','لا أوافق نوعاً ما','لا أوافق','لا أوافق بشدة'];
+
+function loadSurvey(){
+  const raw = localStorage.getItem('survey_config');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch(e){ return null; }
+}
+
+// ═══════════════════════════════════════
+//  SURVEY STATUS CHECK
+// ═══════════════════════════════════════
+function isSurveyOpen(s){
+  if (!s) return false;
+  if (s.status === 'closed' || s.status === 'archived') return false;
+  const now = new Date();
+  if (s.startDate && new Date(s.startDate) > now) return false;
+  if (s.endDate && new Date(s.endDate) < now) return false;
+  return true;
+}
+
+// ═══════════════════════════════════════
+//  BUILD FORM
+// ═══════════════════════════════════════
+const ICONS = ['📝','🔬','📊','📐','🧩','🔍','📋','💡','🎯','🧪'];
+const ICON_BG = ['si-0','si-1','si-2','si-3','si-4','si-5'];
+
+function buildForm(){
+  const s = survey;
+  const container = document.getElementById('sections-container');
+  let html = '';
+  STEPS = [];
+
+  // ── Step 0: Personal Fields ──
+  if (s.personalFields && s.personalFields.length > 0) {
+    STEPS.push({ id: 'info', label: 'البيانات الشخصية' });
+    let fieldsHtml = '';
+    s.personalFields.forEach(f => {
+      fieldsHtml += buildPersonalField(f);
+    });
+    html += `<div class="section-card" data-step="0">
+      <div class="section-head">
+        <div class="section-icon si-0">👤</div>
+        <div class="section-meta"><h2>البيانات الشخصية</h2><p>يرجى تعبئة البيانات التالية</p></div>
+      </div>
+      ${fieldsHtml}
+    </div>`;
+  }
+
+  // ── Steps 1+: Axes ──
+  (s.axes || []).forEach((ax, ai) => {
+    STEPS.push({ id: `axis${ai}`, label: ax.title });
+    let axHtml = '';
+    let qCount = 0;
+    (ax.dims || []).forEach((dim, di) => {
+      const qs = dim.questions || [];
+      if (!qs.length) return;
+      const hasLikert = qs.some(q => !q.type || q.type==='likert5' || q.type==='likert7');
+      const hasLikert7 = qs.some(q => q.type==='likert7');
+      const likertLabels = hasLikert7 ? LIKERT7_L : LIKERT5_L;
+      const likertCols = hasLikert7 ? 7 : 5;
+      axHtml += `<div class="dim-title">${dim.title}</div>`;
+      if (hasLikert) {
+        axHtml += `<div style="display:grid;grid-template-columns:repeat(${likertCols},1fr);gap:4px;text-align:center;margin-bottom:.5rem;padding:0 38px">
+          ${likertLabels.map(l=>`<div style="font-size:9.5px;color:var(--text3);font-weight:600;padding:3px 2px;line-height:1.3">${l}</div>`).join('')}
+        </div>`;
+      }
+      qs.forEach((q, qi) => {
+        axHtml += buildQuestion(q, ai, di, qi);
+        qCount++;
+      });
+    });
+    const stepIdx = STEPS.length - 1;
+    html += `<div class="section-card" data-step="${stepIdx}">
+      <div class="section-head">
+        <div class="section-icon ${ICON_BG[(ai+1) % ICON_BG.length]}">${ICONS[ai % ICONS.length]}</div>
+        <div class="section-meta">
+          <h2>${ax.title}</h2>
+          <p>${qCount} سؤال — ${ax.variable === 'X' ? 'متغير مستقل' : ax.variable === 'Y' ? 'متغير تابع' : 'تحكيم الأسئلة'}</p>
+        </div>
+      </div>
+      ${axHtml}
+    </div>`;
+  });
+
+  container.innerHTML = html;
+  attachListeners();
+  showStep(0);
+
+  // Step dots
+  document.getElementById('step-dots').innerHTML =
+    STEPS.map((s2,i) => `<div class="step-dot ${i===0?'active':''}" onclick="goStepSafe(${i})" title="${s2.label}"></div>`).join('');
+  document.getElementById('step-total').textContent = STEPS.length;
+}
+
+function buildPersonalField(f){
+  const types = ['dropdown','single','multi'];
+  if (f.type === 'text') {
+    return `<div class="field-group">
+      <div class="field-label">${f.required?'<span class="req">*</span>':''}${f.label}</div>
+      <input class="text-inp" type="text" placeholder="${f.placeholder||''}" data-field="${f.id}" oninput="setInfo('${f.id}',this.value)">
+    </div>`;
+  }
+  if (f.type === 'number') {
+    return `<div class="field-group">
+      <div class="field-label">${f.required?'<span class="req">*</span>':''}${f.label}</div>
+      <input class="text-inp" type="number" placeholder="${f.placeholder||''}" data-field="${f.id}" style="max-width:200px" oninput="setInfo('${f.id}',this.value)">
+    </div>`;
+  }
+  if (f.type === 'date') {
+    return `<div class="field-group">
+      <div class="field-label">${f.required?'<span class="req">*</span>':''}${f.label}</div>
+      <input class="text-inp" type="date" data-field="${f.id}" style="max-width:240px" onchange="setInfo('${f.id}',this.value)">
+    </div>`;
+  }
+  // Chips (dropdown / single / multi)
+  const isMulti = f.type === 'multi';
+  const validOpts = (f.options || []).filter(o=>o&&o.trim());
+  if (!validOpts.length) {
+    return `<div class="field-group">
+      <div class="field-label">${f.required?'<span class="req">*</span>':''}${f.label}</div>
+      <input class="text-inp" type="text" placeholder="أدخل إجابتك..." data-field="${f.id}" oninput="setInfo('${f.id}',this.value)">
+    </div>`;
+  }
+  const opts = validOpts.map(opt =>
+    `<label class="chip" data-field="${f.id}" data-val="${opt}" data-multi="${isMulti}"><span class="chip-dot"></span>${opt}</label>`
+  ).join('');
+  return `<div class="field-group">
+    <div class="field-label">${f.required?'<span class="req">*</span>':''}${f.label}</div>
+    <div class="chips">${opts}</div>
+  </div>`;
+}
+
+function buildQuestion(q, ai, di, qi){
+  const key = `${ai}_${di}_${qi}`;
+  const type = q.type || 'likert5';
+  if (type === 'likert5' || type === 'likert7') {
+    const labels = type === 'likert7' ? LIKERT7_L : LIKERT5_L;
+    const max = labels.length;
+    // Color classes: first = high, last = low
+    const opts = labels.map((lbl, i) => {
+      const val = max - i;
+      const cls = i === 0 ? 'lh' : i === max-1 ? 'll' : 'lm';
+      return `<label class="likert-opt ${cls}" data-qkey="${key}" data-val="${val}">
+        <input type="radio" name="q_${key}" value="${val}">
+        <div class="likert-circle">${val}</div>
+        <div class="likert-lbl">${lbl}</div>
+      </label>`;
+    }).join('');
+    return `<div class="q-item" id="qi-${key}">
+      <div class="q-top">
+        <div class="q-badge">${qi+1}</div>
+        <div class="q-text">${q.text}</div>
+      </div>
+      <div class="likert-row ${type === 'likert7' ? 'l7' : 'l5'}">${opts}</div>
+      <div class="q-progress-bar"><div class="q-progress-fill" id="qpf-${key}" style="width:0%"></div></div>
+    </div>`;
+  }
+  if (type === 'single' || type === 'multi') {
+    const isMulti = type === 'multi';
+    const qOpts = Array.isArray(q.options) ? q.options.filter(o=>o&&o.trim()) : [];
+    if (!qOpts.length) {
+      // No options defined — render as text fallback
+      return `<div class="q-item" id="qi-${key}">
+        <div class="q-top"><div class="q-badge">${qi+1}</div><div class="q-text">${q.text}</div></div>
+        <textarea class="text-inp" rows="2" placeholder="اكتب إجابتك هنا..." style="resize:vertical;margin-top:6px"
+          oninput="setQ('${key}',this.value);document.getElementById('qi-${key}').classList.toggle('answered',!!this.value)"></textarea>
+      </div>`;
+    }
+    const opts = qOpts.map((opt, oi) =>
+      `<div class="mcq-opt" data-qkey="${key}" data-val="${opt}" data-oi="${oi}" data-multi="${isMulti}">
+        <div class="mcq-check">${isMulti ? '☐' : '○'}</div>
+        <span>${opt}</span>
+      </div>`
+    ).join('');
+    return `<div class="q-item" id="qi-${key}">
+      <div class="q-top">
+        <div class="q-badge">${qi+1}</div>
+        <div class="q-text">${q.text}</div>
+      </div>
+      <div class="mcq-opts">${opts}</div>
+    </div>`;
+  }
+  if (type === 'text') {
+    return `<div class="q-item" id="qi-${key}">
+      <div class="q-top">
+        <div class="q-badge">${qi+1}</div>
+        <div class="q-text">${q.text}</div>
+      </div>
+      <textarea class="text-inp" rows="3" placeholder="اكتب إجابتك هنا..." style="resize:vertical;margin-top:6px"
+        oninput="setQ('${key}',this.value);document.getElementById('qi-${key}').classList.toggle('answered',!!this.value)"></textarea>
+    </div>`;
+  }
+  return '';
+}
+
+// ═══════════════════════════════════════
+//  EVENT LISTENERS
+// ═══════════════════════════════════════
+function attachListeners(){
+  // Chip (personal fields)
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const field = chip.dataset.field, val = chip.dataset.val, isMulti = chip.dataset.multi === 'true';
+      if (!isMulti) {
+        document.querySelectorAll(`.chip[data-field="${field}"]`).forEach(c => c.classList.remove('selected'));
+        answers.info[field] = val;
+      } else {
+        chip.classList.toggle('selected');
+        if (!Array.isArray(answers.info[field])) answers.info[field] = [];
+        if (chip.classList.contains('selected')) { answers.info[field].push(val); }
+        else { answers.info[field] = answers.info[field].filter(v => v !== val); }
+        updateProgress(); return;
+      }
+      chip.classList.add('selected');
+      updateProgress();
+    });
+  });
+
+  // Likert
+  document.querySelectorAll('.likert-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const key = opt.dataset.qkey, val = parseInt(opt.dataset.val);
+      document.querySelectorAll(`.likert-opt[data-qkey="${key}"]`).forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      setQ(key, val);
+      document.getElementById('qi-'+key)?.classList.add('answered');
+      document.getElementById('qi-'+key)?.classList.remove('error');
+      const pf = document.getElementById('qpf-'+key);
+      if(pf){
+        const max = document.querySelectorAll(`.likert-opt[data-qkey="${key}"]`).length;
+        pf.style.width = ((val-1)/(max-1)*100)+'%';
+        pf.style.background = val >= max*.6 ? '#16a34a' : val <= max*.4 ? '#dc2626' : '#64748b';
+      }
+      updateProgress();
+    });
+  });
+
+  // MCQ
+  document.querySelectorAll('.mcq-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const key = opt.dataset.qkey, val = opt.dataset.val, isMulti = opt.dataset.multi === 'true';
+      if (!isMulti) {
+        document.querySelectorAll(`.mcq-opt[data-qkey="${key}"]`).forEach(o => {
+          o.classList.remove('selected');
+          o.querySelector('.mcq-check').textContent = '○';
+        });
+        opt.classList.add('selected');
+        opt.querySelector('.mcq-check').textContent = '✓';
+        setQ(key, val);
+      } else {
+        opt.classList.toggle('selected');
+        const ch = opt.querySelector('.mcq-check');
+        ch.textContent = opt.classList.contains('selected') ? '✓' : '☐';
+        if (!Array.isArray(answers.q[key])) answers.q[key] = [];
+        if (opt.classList.contains('selected')) { answers.q[key].push(val); }
+        else { answers.q[key] = answers.q[key].filter(v => v !== val); }
+        updateProgress(); return;
+      }
+      document.getElementById('qi-'+key)?.classList.add('answered');
+      document.getElementById('qi-'+key)?.classList.remove('error');
+      updateProgress();
+    });
+  });
+}
+
+window.setInfo = (field, val) => { answers.info[field] = val; updateProgress(); };
+window.setQ = (key, val) => { answers.q[key] = val; updateProgress(); };
+
+// ═══════════════════════════════════════
+//  STEPS
+// ═══════════════════════════════════════
+function showStep(step){
+  document.querySelectorAll('.section-card').forEach(s => {
+    s.style.display = parseInt(s.dataset.step) === step ? 'block' : 'none';
+  });
+  document.getElementById('step-num').textContent = step + 1;
+  document.getElementById('btn-prev').style.display = step === 0 ? 'none' : 'flex';
+  const isLast = step === STEPS.length - 1;
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.textContent = isLast ? '🎯 إرسال الاستبيان' : 'التالي ←';
+  nextBtn.className = isLast ? 'btn btn-success' : 'btn btn-primary';
+  document.querySelectorAll('.step-dot').forEach((d,i) => {
+    d.className = 'step-dot' + (i < step ? ' done' : i === step ? ' active' : '');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateProgress();
+}
+
+window.goStepSafe = s => { if(s < currentStep){ currentStep=s; showStep(s); } };
+
+window.nextStep = () => {
+  if (!validateStep(currentStep)) return;
+  if (currentStep < STEPS.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  } else {
+    submitSurvey();
+  }
+};
+window.prevStep = () => { if(currentStep > 0){ currentStep--; showStep(currentStep); } };
+
+function validateStep(step){
+  let ok = true;
+  const banner = document.getElementById('val-banner');
+  banner.classList.remove('show');
+
+  if (step === 0 && survey.personalFields && survey.personalFields.length > 0) {
+    survey.personalFields.filter(f => f.required).forEach(f => {
+      const v = answers.info[f.id];
+      if (!v || (Array.isArray(v) && !v.length)) { ok = false; }
+    });
+  } else {
+    const axIdx = step - (survey.personalFields && survey.personalFields.length ? 1 : 0);
+    const ax = survey.axes && survey.axes[axIdx];
+    if (ax) {
+      (ax.dims || []).forEach((dim, di) => {
+        (dim.questions || []).forEach((q, qi) => {
+          const key = `${axIdx}_${di}_${qi}`;
+          const v = answers.q[key];
+          if (!v || (Array.isArray(v) && !v.length)) {
+            ok = false;
+            document.getElementById('qi-'+key)?.classList.add('error');
+          }
+        });
+      });
+    }
+  }
+  if (!ok){ banner.classList.add('show'); banner.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+  return ok;
+}
+
+function updateProgress(){
+  const s = survey;
+  let total = 0, filled = 0;
+  if (s.personalFields) {
+    s.personalFields.filter(f => f.required).forEach(f => {
+      total++;
+      const v = answers.info[f.id];
+      if (v && (!Array.isArray(v) || v.length)) filled++;
+    });
+  }
+  (s.axes || []).forEach((ax, ai) => {
+    (ax.dims || []).forEach((dim, di) => {
+      (dim.questions || []).forEach((q, qi) => {
+        total++;
+        const v = answers.q[`${ai}_${di}_${qi}`];
+        if (v !== undefined && v !== null && v !== '' && (!Array.isArray(v) || v.length)) filled++;
+      });
+    });
+  });
+  const pct = total ? Math.round(filled/total*100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+// ═══════════════════════════════════════
+//  SUBMIT
+// ═══════════════════════════════════════
+async function submitSurvey(){
+  const btn = document.getElementById('btn-next');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span> جارٍ الإرسال...';
+
+  const submission = {
+    ...answers.info,
+    answers: answers.q,
+    submittedAt: new Date().toISOString(),
+    duration: Math.round((Date.now() - startTime) / 1000),
+    userAgent: navigator.userAgent.substring(0, 80)
+  };
+
+  try {
+    if (db) {
+      const { ref, push, set, get } = db;
+      await push(ref(db.db, 'submissions'), submission);
+      const metaRef = ref(db.db, 'meta/count');
+      const snap = await get(metaRef);
+      await set(metaRef, (snap.val() || 0) + 1);
+    } else {
+      const saved = JSON.parse(localStorage.getItem('offline_submissions') || '[]');
+      saved.push(submission);
+      localStorage.setItem('offline_submissions', JSON.stringify(saved));
+    }
+    showSuccess();
+  } catch(e) {
+    console.error(e);
+    btn.disabled = false;
+    btn.textContent = '🔄 إعادة المحاولة';
+  }
+}
+
+function showSuccess(){
+  const s = survey;
+  document.getElementById('hero-section').style.display = 'none';
+  document.getElementById('survey-form').style.display = 'none';
+  document.getElementById('nav-btns').style.display = 'none';
+  document.getElementById('sticky-progress').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+  if (s.successMessage) document.getElementById('success-msg').textContent = s.successMessage;
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const c = document.getElementById('confetti');
+  const colors = ['#3b6ff0','#16a34a','#d97706','#7c3aed','#dc2626','#0891b2'];
+  for(let i=0;i<60;i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}%;top:-20px;background:${colors[~~(Math.random()*colors.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.8}s;border-radius:${Math.random()>.5?'50%':'2px'}`;
+    c.appendChild(p);
+    setTimeout(() => p.remove(), 4000);
+  }
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+async function init(){
+  initTheme();
+  document.getElementById('loading-screen').style.display = 'flex';
+
+  await initFirebase();
+
+  survey = loadSurvey();
+
+  document.getElementById('loading-screen').style.display = 'none';
+
+  if (!survey) {
+    document.getElementById('closed-screen').style.display = 'flex';
+    document.getElementById('closed-screen').querySelector('h2').textContent = 'الاستبيان غير متاح';
+    document.getElementById('closed-screen').querySelector('p').textContent = 'لم يتم إعداد الاستبيان بعد. يرجى التواصل مع الباحث.';
+    return;
+  }
+
+  // Update site header
+  document.getElementById('site-title').childNodes[0].textContent = survey.title || 'استبيان';
+  if (survey.description) document.getElementById('site-sub').textContent = survey.description.substring(0,60);
+
+  if (!isSurveyOpen(survey)){
+    document.getElementById('closed-screen').style.display = 'flex';
+    return;
+  }
+
+  // Count stats
+  let totalDims = 0, totalQs = 0;
+  (survey.axes||[]).forEach(ax => {
+    (ax.dims||[]).forEach(dim => { totalDims++; totalQs += (dim.questions||[]).length; });
+  });
+
+  // Populate hero
+  document.getElementById('hero-title').innerHTML =
+    survey.title ? survey.title.replace(/([:،—-])/, '<br><span>$1') + (survey.title.includes(':') || survey.title.includes('—') ? '' : '</span>') : 'استبيان بحثي';
+  document.getElementById('hero-desc').textContent = survey.description || '';
+  document.getElementById('hs-axes').textContent = (survey.axes||[]).length;
+  document.getElementById('hs-dims').textContent = totalDims;
+  document.getElementById('hs-qs').textContent = totalQs;
+  const timeMin = Math.ceil(totalQs * 0.5);
+  document.getElementById('hs-time').textContent = `${timeMin}–${timeMin+5} دقيقة`;
+
+  document.getElementById('hero-section').style.display = 'block';
+
+  // Start button
+  const startBtn = document.createElement('button');
+  startBtn.className = 'btn btn-primary';
+  startBtn.style.cssText = 'margin-top:1.5rem;padding:14px 36px;font-size:15px;animation:pulse 2s infinite';
+  startBtn.textContent = '🚀 ابدأ الاستبيان';
+  startBtn.onclick = () => {
+    document.getElementById('hero-section').style.display = 'none';
+    document.getElementById('survey-form').style.display = 'block';
+    document.getElementById('nav-btns').style.display = 'flex';
+    document.getElementById('sticky-progress').style.display = 'block';
+    buildForm();
+    startTime = Date.now();
+  };
+  document.getElementById('hero-section').appendChild(startBtn);
+}
+
+init();
+</script>
+</body>
+</html>
