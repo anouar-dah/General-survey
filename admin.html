@@ -173,6 +173,41 @@ tbody tr:last-child td{border-bottom:none}
 .empty{text-align:center;padding:3rem 1rem;color:var(--text3)}
 .empty h3{font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px}
 
+/* ═══ ZEBRA ROWS ═══ */
+tbody tr:nth-child(even) td{background:rgba(59,111,240,.025)}
+[data-theme=dark] tbody tr:nth-child(even) td{background:rgba(59,111,240,.04)}
+
+/* ═══ TABLE HEADER COLORS ═══ */
+thead th{background:linear-gradient(135deg,rgba(59,111,240,.1),rgba(124,58,237,.06));color:var(--text);border-bottom:2px solid rgba(59,111,240,.2)}
+
+/* ═══ SPSS SECTION COLORS ═══ */
+.spss-section{border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--border);margin-bottom:1.5rem;box-shadow:var(--shadow)}
+.spss-head{padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(59,111,240,.09),rgba(124,58,237,.05));border-bottom:2px solid rgba(59,111,240,.2);flex-wrap:wrap;gap:8px}
+.spss-head-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.spss-body{background:var(--bg2);padding:1.5rem}
+
+/* ═══ BUILDER COLORS ═══ */
+.builder-section{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;overflow:hidden;box-shadow:var(--shadow)}
+.builder-head{padding:.875rem 1.25rem;background:linear-gradient(135deg,rgba(59,111,240,.07),rgba(124,58,237,.04));border-bottom:2px solid rgba(59,111,240,.18);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;cursor:pointer;transition:background .2s}
+.builder-head:hover{background:linear-gradient(135deg,rgba(59,111,240,.11),rgba(124,58,237,.07))}
+.dim-block{background:rgba(59,111,240,.03);border:1px solid rgba(59,111,240,.12);border-radius:var(--r2);padding:1rem;margin-bottom:.75rem}
+[data-theme=dark] .dim-block{background:rgba(59,111,240,.06);border-color:rgba(59,111,240,.15)}
+
+/* ═══ KPI COLORS ═══ */
+.kpi:nth-child(1){border-top:3px solid var(--accent)}
+.kpi:nth-child(2){border-top:3px solid var(--purple)}
+.kpi:nth-child(3){border-top:3px solid var(--green)}
+.kpi:nth-child(4){border-top:3px solid var(--amber)}
+.kpi:nth-child(5){border-top:3px solid var(--teal)}
+
+/* ═══ CARD SECTION COLORS ═══ */
+.section-card-colored{border-top:3px solid var(--accent)}
+.card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.25rem;transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:rgba(59,111,240,.3);box-shadow:var(--shadow2)}
+
+/* ═══ INTERPRETATION BLOCK ═══ */
+.interp-block{background:linear-gradient(135deg,rgba(59,111,240,.04),rgba(124,58,237,.02));border:1px solid rgba(59,111,240,.15);border-right:4px solid var(--accent);border-radius:var(--r2);padding:1.125rem 1.375rem;font-size:13px;color:var(--text2);line-height:2;text-align:justify;margin-top:1rem}
+
 /* ═══ LIVE RESPONSE ═══ */
 .live-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:var(--r2);border:1px solid var(--border);font-size:12px;animation:pop .3s;margin-bottom:6px}
 .live-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:var(--bg4);color:var(--text3)}
@@ -194,7 +229,12 @@ select.inp{cursor:pointer}
 .add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,111,240,.04)}
 .remove-btn{padding:5px 10px;border-radius:var(--r3);border:none;background:rgba(220,38,38,.08);color:var(--red);cursor:pointer;font-size:12px;transition:.2s;flex-shrink:0}
 .remove-btn:hover{background:rgba(220,38,38,.18)}
-.dim-block{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:1rem;margin-bottom:.75rem}
+.dim-block{background:rgba(59,111,240,.03);border:1.5px solid rgba(59,111,240,.15);border-radius:var(--r2);padding:1rem;margin-bottom:.75rem}
+.dim-block:nth-child(even){background:rgba(124,58,237,.03);border-color:rgba(124,58,237,.15)}
+.q-row-colored{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r3);padding:.875rem;margin-bottom:8px}
+.q-row-colored:nth-child(odd){background:rgba(5,150,105,.025);border-color:rgba(5,150,105,.12)}
+tbody tr:nth-child(even) td{background:rgba(59,111,240,.025)}
+tbody tr:nth-child(odd) td{background:transparent}
 .q-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r3);padding:.75rem;margin-bottom:6px;display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:start}
 
 /* ═══ LOGIN ═══ */
@@ -231,6 +271,31 @@ select.inp{cursor:pointer}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ═══ TABLE COLORS ═══ */
+thead th { border-bottom: 2px solid var(--accent) !important; }
+thead th:nth-child(odd)  { background: rgba(59,111,240,.07) !important; }
+thead th:nth-child(even) { background: rgba(124,58,237,.06) !important; }
+tbody tr:nth-child(odd)  td { background: rgba(59,111,240,.025); }
+tbody tr:nth-child(even) td { background: var(--bg2); }
+tbody tr:hover td { background: rgba(59,111,240,.07) !important; }
+tbody td { border-bottom: 1px solid var(--border) !important; }
+/* BUILDER colored sections */
+.builder-section { border-right: 3px solid var(--accent) !important; }
+.dim-block { border-right: 3px solid var(--purple) !important; border-radius: var(--r2) !important; }
+#q-row-template { border-right: 3px solid var(--teal) !important; }
+[id^="q-row-"] { border-right: 3px solid var(--teal) !important; }
+/* SPSS section alternating */
+.spss-section:nth-child(odd)  { border-right: 4px solid var(--accent); }
+.spss-section:nth-child(even) { border-right: 4px solid var(--purple); }
+.spss-head { background: linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.04)) !important; }
+/* KPI colors */
+.kpi:nth-child(1){border-top:3px solid var(--accent)}
+.kpi:nth-child(2){border-top:3px solid var(--purple)}
+.kpi:nth-child(3){border-top:3px solid var(--green)}
+.kpi:nth-child(4){border-top:3px solid var(--amber)}
+.kpi:nth-child(5){border-top:3px solid var(--teal)}
+
 </style>
 </head>
 <body>
@@ -418,19 +483,59 @@ select.inp{cursor:pointer}
 
 <!-- ─── IMPORT ─── -->
 <div class="page" id="page-import">
-  <div class="pg-hdr"><div><div class="pg-title">استيراد بيانات</div><div class="pg-sub">استيراد ملف JSON أو CSV</div></div></div>
+  <div class="pg-hdr"><div><div class="pg-title">استيراد وإدارة البيانات</div><div class="pg-sub">استيراد JSON أو CSV · دمج الـ Offline · مزامنة Firebase</div></div></div>
+
+  <!-- استيراد ملف -->
   <div class="card">
-    <div class="card-title" style="margin-bottom:1rem">📤 رفع ملف بيانات</div>
-    <input type="file" accept=".json,.csv" id="import-file" style="margin-bottom:12px;font-family:'Tajawal',sans-serif;font-size:13px;color:var(--text2)">
-    <button class="btn btn-primary" onclick="importData()">📥 استيراد</button>
-    <div id="import-result" style="margin-top:1rem;font-size:13px;color:var(--text2)"></div>
+    <div class="card-head"><div class="card-title">📤 استيراد ملف بيانات</div></div>
+    <div style="background:rgba(59,111,240,.05);border:1px solid rgba(59,111,240,.15);border-radius:var(--r2);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2)">
+      ادعم ملفات <strong>JSON</strong> (من تصدير هذا التطبيق) أو <strong>CSV</strong> (بيانات خام).
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
+      <input type="file" accept=".json,.csv" id="import-file"
+        style="flex:1;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--r3);background:var(--bg3);color:var(--text2);font-family:'Tajawal',sans-serif;font-size:13px;cursor:pointer">
+      <button class="btn btn-primary" onclick="importData()">📥 استيراد</button>
+    </div>
+    <div id="import-result" style="font-size:13px;color:var(--text2);min-height:24px"></div>
+    <div id="import-preview" style="margin-top:1rem"></div>
   </div>
+
+  <!-- استيراد استبيان JSON -->
   <div class="card">
-    <div class="card-title" style="margin-bottom:1rem">💾 بيانات Offline</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">البيانات المحفوظة محلياً (<span id="offline-count">0</span> سجل)</p>
-    <button class="btn btn-success" onclick="mergeOffline()">🔀 دمج مع قاعدة البيانات</button>
-    <button class="btn btn-danger" onclick="clearOffline()" style="margin-right:8px">🗑 مسح المحلي</button>
+    <div class="card-head"><div class="card-title">🗂 استيراد بنية استبيان (survey_config)</div></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem">إذا كان لديك ملف JSON لبنية استبيان من جهاز آخر، يمكنك رفعه هنا لاستعادته.</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <input type="file" accept=".json" id="import-survey-file"
+        style="flex:1;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--r3);background:var(--bg3);color:var(--text2);font-family:'Tajawal',sans-serif;font-size:13px;cursor:pointer">
+      <button class="btn btn-success" onclick="importSurveyConfig()">📋 استيراد الاستبيان</button>
+    </div>
+    <div id="survey-import-result" style="margin-top:8px;font-size:13px"></div>
   </div>
+
+  <!-- بيانات Offline -->
+  <div class="card">
+    <div class="card-head">
+      <div><div class="card-title">💾 البيانات المحفوظة محلياً (Offline)</div><div class="card-sub" id="offline-count-label">جارٍ التحقق...</div></div>
+    </div>
+    <div id="offline-list" style="max-height:300px;overflow-y:auto;margin-bottom:1rem"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-success" onclick="mergeOffline()">🔀 دمج مع Firebase</button>
+      <button class="btn btn-danger" onclick="clearOffline()">🗑 مسح المحلي</button>
+      <button class="btn btn-ghost" onclick="renderImport()">🔄 تحديث</button>
+    </div>
+    <div id="merge-result" style="margin-top:8px;font-size:13px"></div>
+  </div>
+
+  <!-- مزامنة Firebase -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">🔥 مزامنة Firebase</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="forceSyncFromFirebase()">⬇️ جلب من Firebase</button>
+      <button class="btn btn-ghost" onclick="forcePushToFirebase()">⬆️ رفع إلى Firebase</button>
+    </div>
+    <div id="sync-result" style="margin-top:8px;font-size:13px;color:var(--text2)"></div>
+  </div>
+  <span id="offline-count" style="display:none">0</span>
 </div>
 
 <!-- ─── ANALYSIS ─── -->
@@ -504,13 +609,25 @@ select.inp{cursor:pointer}
 <div class="page" id="page-settings">
   <div class="pg-hdr"><div><div class="pg-title">الإعدادات</div></div></div>
   <div class="card">
-    <div class="card-title" style="margin-bottom:1rem">🔥 Firebase</div>
-    <label style="font-size:12px;font-weight:700;color:var(--text3);display:block;margin-bottom:6px">إعدادات Firebase (JSON)</label>
-    <textarea class="inp" id="fb-config" rows="6" placeholder='{"apiKey":"...","databaseURL":"https://xxx.firebaseio.com"}'></textarea>
-    <div style="margin-top:10px;display:flex;gap:8px">
+    <div class="card-title" style="margin-bottom:1rem">🔥 Firebase — إعداد المزامنة</div>
+    <div style="background:rgba(59,111,240,.06);border:1px solid rgba(59,111,240,.2);border-radius:var(--r2);padding:.875rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);line-height:1.9">
+      <strong>كيفية الإعداد:</strong><br>
+      ١. افتح <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent)">console.firebase.google.com</a><br>
+      ٢. اختر مشروعك <strong>survey-ai-project-3f4b8</strong><br>
+      ٣. اذهب إلى Project Settings → General → Your apps → SDK setup<br>
+      ٤. انسخ الكود واضغط "ملء تلقائي" أدناه أو الصقه يدوياً<br>
+      <div style="margin-top:6px;padding:6px 10px;background:var(--bg3);border-radius:var(--r3);font-family:monospace;font-size:11px;direction:ltr;text-align:left;color:var(--text2)">
+        ⚠️ تأكد من تفعيل Realtime Database وإضافة rules: { ".read": true, ".write": true }
+      </div>
+    </div>
+    <label style="font-size:12px;font-weight:700;color:var(--text3);display:block;margin-bottom:6px">إعدادات Firebase (JSON أو كائن JS)</label>
+    <textarea class="inp" id="fb-config" rows="10" placeholder='{"apiKey":"AIzaSy...","authDomain":"...","databaseURL":"https://xxx-rtdb.firebaseio.com","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}' style="font-family:monospace;font-size:11.5px;direction:ltr"></textarea>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="saveFirebase()">💾 حفظ وتطبيق</button>
       <button class="btn btn-ghost" onclick="testFirebase()">🔌 اختبار الاتصال</button>
+      <button class="btn btn-ghost" onclick="autoFillFirebase()">✨ ملء تلقائي (مشروعك)</button>
     </div>
+    <div id="fb-status-msg" style="margin-top:8px;font-size:12px;color:var(--text3)"></div>
   </div>
   <div class="card">
     <div class="card-title" style="margin-bottom:1rem">🔑 كلمة مرور الباحث</div>
@@ -685,47 +802,72 @@ select.inp{cursor:pointer}
 <!-- ─── AI CHAT ─── -->
 <div class="page" id="page-aichat">
   <div class="pg-hdr">
-    <div><div class="pg-title">💬 مساعد البحث الأكاديمي</div><div class="pg-sub">يستخدم Claude API لتفسير نتائجك أكاديمياً</div></div>
+    <div><div class="pg-title">🤖 مساعد البحث بالذكاء الاصطناعي</div>
+      <div class="pg-sub">Gemini · Groq · OpenRouter — يحلل بياناتك ويكتب التفسيرات الأكاديمية</div></div>
     <div class="pg-actions">
-      <button class="btn btn-ghost" onclick="clearChat()">🗑 مسح</button>
+      <button class="btn btn-ghost" onclick="clearChat()">🗑 مسح المحادثة</button>
+      <button class="btn btn-analyze" onclick="aiAutoAnalyze()">⚡ تحليل تلقائي شامل</button>
     </div>
+  </div>
+
+  <!-- API Provider Selection -->
+  <div class="card" style="margin-bottom:1rem">
+    <div style="font-size:13px;font-weight:700;margin-bottom:.875rem;color:var(--text)">⚙️ إعداد مزوّد الذكاء الاصطناعي</div>
+    <div style="display:flex;gap:8px;margin-bottom:.875rem;flex-wrap:wrap">
+      <button id="prov-gemini" class="btn btn-primary" onclick="selectProvider('gemini')" style="border-radius:20px">✨ Gemini (مجاني)</button>
+      <button id="prov-groq" class="btn btn-ghost" onclick="selectProvider('groq')" style="border-radius:20px">⚡ Groq (مجاني سريع)</button>
+      <button id="prov-openrouter" class="btn btn-ghost" onclick="selectProvider('openrouter')" style="border-radius:20px">🌐 OpenRouter</button>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div id="ai-provider-hint" style="font-size:11px;color:var(--text3);flex:1">
+        احصل على مفتاح Gemini مجاناً من: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com</a>
+      </div>
+      <input class="inp" type="password" id="ai-key-input" placeholder="أدخل المفتاح هنا..."
+        style="flex:1;min-width:220px;padding:7px 12px;font-family:monospace;font-size:12px"
+        oninput="saveAIKey(this.value)">
+      <div id="ai-status" style="font-size:11px;padding:5px 12px;background:var(--bg4);border-radius:20px;color:var(--text3);white-space:nowrap">غير متصل</div>
+    </div>
+    <div id="ai-provider-models" style="margin-top:8px;font-size:11px;color:var(--text3)"></div>
   </div>
 
   <!-- Quick prompts -->
-  <div style="margin-bottom:1.25rem">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase">أسئلة سريعة:</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px">
-      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب تفسيراً أكاديمياً شاملاً لنتائج الاستبيان مناسباً للفصل الرابع')">📝 تفسير شامل</button>
-      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب فقرة صدق وثبات الأداة مناسبة لمذكرة تخرج')">🔒 صدق وثبات</button>
-      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب تحليلاً للفرضيات بناءً على النتائج الإحصائية')">🔬 تحليل الفرضيات</button>
-      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اقترح توصيات علمية بناءً على نتائج الاستبيان')">💡 توصيات</button>
-      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب ملخصاً تنفيذياً للنتائج بالعربية')">📋 ملخص</button>
+  <div style="margin-bottom:1rem">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase">مهام سريعة:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب تفسيراً أكاديمياً شاملاً لنتائج الاستبيان مناسباً للفصل الرابع من مذكرة التخرج')">📝 فصل رابع كامل</button>
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب فقرة صدق وثبات الأداة مع تفسير معاملات الثبات (Alpha) مناسبة لمذكرة تخرج')">🔒 صدق وثبات</button>
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('فسّر نتائج الانحدار الخطي بأسلوب أكاديمي مع كتابة معادلة الانحدار وتفسير المعاملات')">📈 تفسير الانحدار</button>
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اختبر الفرضيات إحصائياً بناءً على النتائج واكتب القرار الإحصائي لكل فرضية')">🔬 اختبار الفرضيات</button>
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اقترح 10 توصيات علمية وعملية بناءً على نتائج الاستبيان')">💡 توصيات</button>
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب ملخصاً تنفيذياً لنتائج الدراسة في فقرة واحدة مركّزة')">📋 ملخص تنفيذي</button>
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('فسّر نتائج بيرسون ومعاملات الارتباط بين المتغيرات بأسلوب أكاديمي')">🔗 تفسير بيرسون</button>
+      <button class="btn btn-ghost" style="font-size:11px;border-radius:20px" onclick="quickPrompt('اكتب خاتمة الدراسة بناءً على أهم النتائج والتوصيات')">🏁 خاتمة الدراسة</button>
     </div>
   </div>
 
-  <!-- API config -->
-  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:1rem;margin-bottom:1rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-    <span style="font-size:12px;font-weight:700;color:var(--text2)">Claude API Key:</span>
-    <input class="inp" type="password" id="claude-key" placeholder="sk-ant-..." style="flex:1;min-width:200px;padding:7px 12px" oninput="localStorage.setItem('claude_key',this.value)">
-    <div id="ai-status" style="font-size:11px;padding:4px 12px;background:var(--bg4);border-radius:20px;color:var(--text3)">غير متصل</div>
-  </div>
-
   <!-- Messages -->
-  <div id="chat-messages" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;min-height:360px;max-height:500px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin-bottom:1rem">
-    <div style="text-align:center;padding:2rem;color:var(--text3)">
-      <div style="font-size:36px;margin-bottom:12px">🤖</div>
-      <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px">مساعد البحث الأكاديمي</div>
-      <div style="font-size:12px;line-height:1.8">أضف مفتاح Claude API ثم اطرح سؤالك<br>أنا أعرف بيانات استبيانك تلقائياً</div>
+  <div id="chat-messages" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;min-height:380px;max-height:520px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin-bottom:1rem">
+    <div style="text-align:center;padding:2.5rem;color:var(--text3)">
+      <div style="font-size:40px;margin-bottom:12px">🤖</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px">مساعد البحث الأكاديمي</div>
+      <div style="font-size:12px;line-height:1.9;max-width:400px;margin:0 auto">
+        اختر مزوّد AI واضف مفتاحك<br>
+        ثم اطرح سؤالك أو اضغط على أحد الأزرار أعلاه<br>
+        <span style="color:var(--accent)">أنا أعرف بيانات استبيانك تلقائياً</span>
+      </div>
     </div>
   </div>
 
   <!-- Input -->
   <div style="display:flex;gap:10px;align-items:flex-end">
-    <textarea id="chat-input" placeholder="اكتب سؤالك... (Ctrl+Enter للإرسال)"
-      style="flex:1;padding:12px 16px;background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);color:var(--text);font-family:'Tajawal',sans-serif;font-size:13px;resize:none;outline:none;height:64px;line-height:1.6;transition:.2s"
+    <textarea id="chat-input" placeholder="اكتب سؤالك أو اطلب تفسيراً... (Ctrl+Enter للإرسال)"
+      style="flex:1;padding:12px 16px;background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);color:var(--text);font-family:'Tajawal',sans-serif;font-size:13px;resize:none;outline:none;height:72px;line-height:1.6;transition:.2s"
       onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){sendChat();return false}"
       onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"></textarea>
-    <button class="btn btn-analyze" onclick="sendChat()" style="height:64px;padding:0 20px">📤 إرسال</button>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <button class="btn btn-analyze" onclick="sendChat()" style="height:36px;padding:0 20px">📤 إرسال</button>
+      <button class="btn btn-ghost" onclick="clearChat()" style="height:30px;font-size:11px">🗑</button>
+    </div>
   </div>
 </div>
 
@@ -840,23 +982,36 @@ window.stab = (id, el, group) => {
 // ══════════════════════════════════════════════════════
 async function initFirebase(){
   const cfg = localStorage.getItem('firebase_config');
-  if (!cfg) return;
+  if (!cfg) { console.log('No Firebase config found'); return; }
   try {
     const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const { getDatabase, ref, push, set, get, onValue, remove } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+    let parsedCfg;
+    try { parsedCfg = JSON.parse(cfg); } catch(e){ toast('Firebase config غير صالح','err'); return; }
     const existing = getApps().find(a => a.name === 'admin-app');
-    const app = existing || initializeApp(JSON.parse(cfg), 'admin-app');
+    const app = existing || initializeApp(parsedCfg, 'admin-app');
     const database = getDatabase(app);
     db = { ref, push, set, get, onValue, remove, db: database };
 
-    // Upload survey structure
-    const surveySnap = await get(ref(database, 'survey'));
-    if (!surveySnap.exists() && survey) await set(ref(database, 'survey'), survey);
+    // ── دائماً اقرأ survey من Firebase أولاً (يغلب localStorage) ──
+    try {
+      const surveySnap = await get(ref(database, 'survey'));
+      if (surveySnap.exists() && surveySnap.val()?.title) {
+        survey = surveySnap.val();
+        localStorage.setItem('survey_config', JSON.stringify(survey));
+        updateHeaderTitle();
+        toast('✅ تم تحميل الاستبيان من Firebase','ok');
+      } else if (survey) {
+        // لا يوجد في Firebase — ارفعه
+        await set(ref(database, 'survey'), survey);
+      }
+    } catch(e){ console.warn('Survey sync error:', e); }
 
-    // Listen for responses
+    // ── استمع لتغييرات الاستجابات في الوقت الفعلي ──
     onValue(ref(database, 'submissions'), snap => {
       if (snap.exists()) {
-        respondents = Object.values(snap.val()).map(v => ({ ...v, _id: Object.keys(snap.val()).find(k => snap.val()[k] === v) }));
+        const val = snap.val();
+        respondents = Object.entries(val).map(([k,v]) => ({ ...v, _id: k }));
         respondents.sort((a,b) => new Date(b.submittedAt||0) - new Date(a.submittedAt||0));
       } else respondents = [];
       updateSbBadge();
@@ -864,11 +1019,25 @@ async function initFirebase(){
       if (document.getElementById('page-responses').classList.contains('active')) renderResponses();
     });
 
+    // ── استمع لتغييرات survey من أجهزة أخرى ──
+    onValue(ref(database, 'survey'), snap => {
+      if (snap.exists() && snap.val()?.title) {
+        const fbSurvey = snap.val();
+        if (JSON.stringify(fbSurvey) !== JSON.stringify(survey)) {
+          survey = fbSurvey;
+          localStorage.setItem('survey_config', JSON.stringify(survey));
+          updateHeaderTitle();
+        }
+      }
+    });
+
     document.getElementById('db-dot').classList.add('on');
-    document.getElementById('db-label').textContent = 'متصل';
+    document.getElementById('db-label').textContent = 'متصل ✓';
+    console.log('Firebase connected successfully');
   } catch(e) {
-    console.warn('Firebase failed:', e);
+    console.error('Firebase init error:', e);
     document.getElementById('db-label').textContent = 'غير متصل';
+    toast('تعذّر الاتصال بـ Firebase: '+e.message,'err');
   }
 }
 
@@ -914,9 +1083,15 @@ window.saveSurvey = async () => {
   flushBuilderInputs();
   saveSurveyLocal();
   if (db) {
-    try { await db.set(db.ref(db.db, 'survey'), survey); } catch(e){}
+    try {
+      await db.set(db.ref(db.db, 'survey'), survey);
+      toast('✅ تم حفظ الاستبيان وزامنته مع Firebase','ok');
+    } catch(e){
+      toast('✅ تم حفظ محلياً (Firebase غير متصل)','ok');
+    }
+  } else {
+    toast('✅ تم حفظ الاستبيان محلياً','ok');
   }
-  toast('✅ تم حفظ الاستبيان','ok');
   updateHeaderTitle();
 };
 
@@ -1656,35 +1831,160 @@ window.setSurveyStatus = s => {
 // ══════════════════════════════════════════════════════
 function renderImport(){
   const ls = JSON.parse(localStorage.getItem('offline_submissions')||'[]');
-  document.getElementById('offline-count').textContent = ls.length;
+  const cnt = document.getElementById('offline-count');
+  if(cnt) cnt.textContent = ls.length;
+  const lbl = document.getElementById('offline-count-label');
+  if(lbl) lbl.textContent = `${ls.length} سجل محفوظ محلياً`;
+  const listEl = document.getElementById('offline-list');
+  if(listEl){
+    if(!ls.length){listEl.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:1rem">لا توجد بيانات offline</div>';}
+    else {
+      listEl.innerHTML=ls.map((r,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--r3);margin-bottom:5px;font-size:12px;border:1px solid var(--border)">
+          <div style="width:22px;height:22px;border-radius:50%;background:rgba(59,111,240,.1);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;color:var(--text)">${(survey?.personalFields||[]).slice(0,1).map(f=>r[f?.id]||'').filter(Boolean).join(' ')||'مستجيب'}</div>
+            <div style="color:var(--text3);font-size:11px">${Object.keys(r.answers||{}).length} إجابة · ${r.submittedAt?new Date(r.submittedAt).toLocaleString('ar-DZ'):'—'}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
 }
+
 window.importData = () => {
-  const f = document.getElementById('import-file').files[0];
+  const f = document.getElementById('import-file')?.files?.[0];
   if(!f){toast('اختر ملفاً','err');return;}
+  const resultEl = document.getElementById('import-result');
+  const previewEl = document.getElementById('import-preview');
+  if(resultEl) resultEl.innerHTML = '⏳ جارٍ التحليل...';
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      let data;
-      if(f.name.endsWith('.json')) data = JSON.parse(e.target.result);
-      else { /* CSV parse */ data = e.target.result.split('\n').slice(1).filter(Boolean).map(row=>{const vals=row.split(',');return{submittedAt:vals[0],answers:{}};}); }
-      data.forEach(r=>respondents.push({...r,_source:'imported'}));
-      document.getElementById('import-result').textContent = `✅ تم استيراد ${data.length} سجل`;
-      toast(`✅ استيراد ${data.length} سجل`,'ok');
-    } catch(e){ toast('خطأ في تحليل الملف','err'); }
+      let data = [];
+      if(f.name.endsWith('.json')){
+        const parsed = JSON.parse(e.target.result);
+        // دعم ثلاثة أشكال: مصفوفة · {respondents:[...]} · {submissions:{...}}
+        if(Array.isArray(parsed)) data = parsed;
+        else if(parsed.respondents) data = parsed.respondents;
+        else if(parsed.submissions) data = Object.values(parsed.submissions);
+        else if(parsed.answers) data = [parsed]; // سجل واحد
+        else data = Object.values(parsed);
+      } else {
+        // CSV: السطر الأول هو العناوين
+        const lines = e.target.result.split(/\r?\n/).filter(Boolean);
+        if(lines.length < 2){toast('CSV فارغ أو غير صالح','err');return;}
+        const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+        data = lines.slice(1).map(row=>{
+          const vals = row.split(',').map(v=>v.replace(/^"|"$/g,'').trim());
+          const obj = {answers:{}};
+          headers.forEach((h,i)=>{ obj[h]=vals[i]||''; });
+          return obj;
+        });
+      }
+      data = data.filter(r => r && typeof r === 'object');
+      if(!data.length){toast('لم يُعثر على بيانات صالحة في الملف','err');return;}
+      let added=0;
+      data.forEach(r=>{
+        if(!respondents.find(x=>x.submittedAt&&x.submittedAt===r.submittedAt)){
+          respondents.push({...r,_source:'imported'});added++;
+        }
+      });
+      if(resultEl) resultEl.innerHTML=`<span style="color:var(--green)">✅ تم استيراد ${added} سجل جديد (${data.length-added} مكرر تم تجاهله)</span>`;
+      // preview
+      if(previewEl) previewEl.innerHTML=`<div style="font-size:11px;color:var(--text3);margin-top:8px">عينة البيانات (أول 3 سجلات):</div>
+        <div style="overflow-x:auto;margin-top:6px"><table style="font-size:11px;min-width:100%">
+          <thead><tr>${Object.keys(data[0]).slice(0,6).map(k=>`<th style="padding:4px 8px;background:var(--bg3)">${k}</th>`).join('')}</tr></thead>
+          <tbody>${data.slice(0,3).map(r=>`<tr>${Object.values(r).slice(0,6).map(v=>`<td style="padding:4px 8px">${String(v||'').substring(0,30)}</td>`).join('')}</tr>`).join('')}
+          </tbody></table></div>`;
+      toast(`✅ استيراد ${added} سجل`,'ok');
+      updateSbBadge();
+    } catch(err){
+      if(resultEl) resultEl.innerHTML=`<span style="color:var(--red)">❌ خطأ: ${err.message}</span>`;
+      toast('خطأ في تحليل الملف','err');
+    }
   };
-  reader.readAsText(f);
+  reader.readAsText(f,'utf-8');
 };
+
+window.importSurveyConfig = () => {
+  const f = document.getElementById('import-survey-file')?.files?.[0];
+  if(!f){toast('اختر ملف JSON للاستبيان','err');return;}
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const s = parsed.survey || parsed;
+      if(!s.title && !s.axes){toast('الملف لا يحتوي على بنية استبيان صالحة','err');return;}
+      survey = s;
+      saveSurveyLocal();
+      document.getElementById('survey-import-result').innerHTML='<span style="color:var(--green)">✅ تم استيراد بنية الاستبيان. اذهب إلى "بناء الاستبيان" للمراجعة.</span>';
+      updateHeaderTitle();
+      toast('✅ تم استيراد الاستبيان','ok');
+    } catch(e){toast('خطأ في تحليل الملف: '+e.message,'err');}
+  };
+  reader.readAsText(f,'utf-8');
+};
+
 window.mergeOffline = async () => {
   const ls = JSON.parse(localStorage.getItem('offline_submissions')||'[]');
+  const resultEl = document.getElementById('merge-result');
   if(!ls.length){toast('لا توجد بيانات محلية','err');return;}
-  if(!db){toast('Firebase غير متصل','err');return;}
+  if(!db){
+    toast('Firebase غير متصل — تأكد من إعداداته','err');
+    if(resultEl) resultEl.innerHTML='<span style="color:var(--red)">Firebase غير متصل</span>';
+    return;
+  }
+  if(resultEl) resultEl.innerHTML='⏳ جارٍ الدمج...';
   try {
-    for(const r of ls) await db.push(db.ref(db.db,'submissions'), r);
+    let pushed=0;
+    for(const r of ls){
+      const clean={...r}; delete clean._source; delete clean._id;
+      await db.push(db.ref(db.db,'submissions'), clean);
+      pushed++;
+    }
     localStorage.removeItem('offline_submissions');
-    toast(`✅ تم دمج ${ls.length} سجل`,'ok');
-  } catch(e){ toast('فشل الدمج','err'); }
+    renderImport();
+    if(resultEl) resultEl.innerHTML=`<span style="color:var(--green)">✅ تم دمج ${pushed} سجل مع Firebase</span>`;
+    toast(`✅ تم دمج ${pushed} سجل`,'ok');
+  } catch(e){
+    if(resultEl) resultEl.innerHTML=`<span style="color:var(--red)">❌ فشل الدمج: ${e.message}</span>`;
+    toast('فشل الدمج','err');
+  }
 };
-window.clearOffline = () => { localStorage.removeItem('offline_submissions'); renderImport(); toast('✅ تم المسح','ok'); };
+
+window.clearOffline = () => {
+  localStorage.removeItem('offline_submissions');
+  renderImport();
+  toast('✅ تم مسح البيانات المحلية','ok');
+};
+
+window.forceSyncFromFirebase = async () => {
+  const syncEl = document.getElementById('sync-result');
+  if(!db){toast('Firebase غير متصل','err');return;}
+  if(syncEl) syncEl.innerHTML='⏳ جارٍ الجلب من Firebase...';
+  try {
+    const snap = await db.get(db.ref(db.db,'survey'));
+    if(snap.exists()&&snap.val()?.title){
+      survey=snap.val();
+      localStorage.setItem('survey_config',JSON.stringify(survey));
+      updateHeaderTitle();
+      if(syncEl) syncEl.innerHTML='<span style="color:var(--green)">✅ تم جلب الاستبيان من Firebase</span>';
+      toast('✅ تم جلب الاستبيان','ok');
+    } else {if(syncEl) syncEl.innerHTML='<span style="color:var(--amber)">⚠️ لا يوجد استبيان في Firebase</span>';}
+  } catch(e){if(syncEl)syncEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;}
+};
+
+window.forcePushToFirebase = async () => {
+  const syncEl = document.getElementById('sync-result');
+  if(!db){toast('Firebase غير متصل','err');return;}
+  if(!survey){toast('لا يوجد استبيان للرفع','err');return;}
+  if(syncEl) syncEl.innerHTML='⏳ جارٍ الرفع إلى Firebase...';
+  try {
+    await db.set(db.ref(db.db,'survey'),survey);
+    if(syncEl) syncEl.innerHTML='<span style="color:var(--green)">✅ تم رفع الاستبيان إلى Firebase</span>';
+    toast('✅ تم رفع الاستبيان','ok');
+  } catch(e){if(syncEl)syncEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;}
+};
 
 // ══════════════════════════════════════════════════════
 //  ANALYSIS - DESCRIPTIVE
@@ -1693,22 +1993,139 @@ function renderAnalysis(){
   const comp = getCompleted(), n = comp.length;
   document.getElementById('an-total').textContent = n;
 
-  // Demog tables
+  // Demog tables + charts
   const demogCont = document.getElementById('demog-tables-container');
   if (survey?.personalFields?.length && n>0) {
-    demogCont.innerHTML = (survey.personalFields||[]).filter(f=>['single','dropdown','multi'].includes(f.type)).map(f => {
-      const counts={};(f.options||[]).forEach(o=>counts[o]=0);
-      comp.forEach(r=>{const v=r[f.id];if(Array.isArray(v))v.forEach(vv=>{if(counts[vv]!==undefined)counts[vv]++;});else if(v&&counts[v]!==undefined)counts[v]++;});
-      const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;
-      return `<div class="card" style="margin-bottom:1rem"><div class="card-title" style="margin-bottom:1rem">📋 ${f.label}</div>
-        <div class="tbl-wrap"><table><thead><tr><th>الفئة</th><th>التكرار</th><th>النسبة %</th></tr></thead><tbody>
-        ${Object.entries(counts).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td><td>${(v/total*100).toFixed(1)}%</td></tr>`).join('')}
-        <tr><td><strong>المجموع</strong></td><td><strong>${total}</strong></td><td><strong>100%</strong></td></tr>
-        </tbody></table></div></div>`;
-    }).join('');
+    const fields = (survey.personalFields||[]).filter(f=>['single','dropdown','multi'].includes(f.type));
+    if(!fields.length){ demogCont.innerHTML='<p style="color:var(--text3);font-size:13px">لا توجد حقول تصنيفية</p>'; }
+    else {
+      const DCOLORS=['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626','#ec4899','#f59e0b','#14b8a6','#f43f5e'];
+      demogCont.innerHTML = fields.map((f,fi) => {
+        const counts={};(f.options||[]).forEach(o=>counts[o]=0);
+        comp.forEach(r=>{const v=r[f.id];if(Array.isArray(v))v.forEach(vv=>{if(counts[vv]!==undefined)counts[vv]++;});else if(v&&counts[v]!==undefined)counts[v]++;});
+        const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;
+        const chartId=`demog-chart-${fi}`;
+        return `<div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem;box-shadow:var(--shadow)">
+          <div style="font-size:14px;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
+            <span style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center">${fi+1}</span>
+            ${f.label}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start">
+            <div>
+              <div class="tbl-wrap"><table>
+                <thead><tr>
+                  <th style="background:rgba(59,111,240,.08);color:var(--accent)">الفئة</th>
+                  <th style="background:rgba(59,111,240,.08);color:var(--accent)">التكرار (n)</th>
+                  <th style="background:rgba(59,111,240,.08);color:var(--accent)">النسبة (%)</th>
+                </tr></thead>
+                <tbody>
+                ${Object.entries(counts).map(([k,v],i)=>`
+                  <tr>
+                    <td style="display:flex;align-items:center;gap:7px">
+                      <span style="width:10px;height:10px;border-radius:50%;background:${DCOLORS[i%DCOLORS.length]};flex-shrink:0;display:inline-block"></span>
+                      ${k}
+                    </td>
+                    <td><strong>${v}</strong></td>
+                    <td>${(v/total*100).toFixed(1)}%</td>
+                  </tr>`).join('')}
+                <tr style="background:var(--bg4);font-weight:700">
+                  <td>المجموع</td><td>${total}</td><td>100%</td>
+                </tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div>
+              <div style="position:relative;height:220px"><canvas id="${chartId}"></canvas></div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center">
+                ${Object.entries(counts).map(([k,v],i)=>`
+                  <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)">
+                    <span style="width:10px;height:10px;border-radius:50%;background:${DCOLORS[i%DCOLORS.length]};flex-shrink:0;display:inline-block"></span>
+                    ${k}: <strong>${v}</strong>
+                  </div>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:10px">المصدر: من إعداد الباحث اعتماداً على بيانات الاستبيان. N=${total}</div>
+        </div>`;
+      }).join('');
+
+      // Draw charts with labels
+      setTimeout(()=>{
+        fields.forEach((f,fi)=>{
+          const counts={};(f.options||[]).forEach(o=>counts[o]=0);
+          comp.forEach(r=>{const v=r[f.id];if(Array.isArray(v))v.forEach(vv=>{if(counts[vv]!==undefined)counts[vv]++;});else if(v&&counts[v]!==undefined)counts[v]++;});
+          const chartId=`demog-chart-${fi}`;
+          const ctx=document.getElementById(chartId)?.getContext('2d');
+          if(!ctx) return;
+          if(charts[chartId]) charts[chartId].destroy();
+          const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;
+          const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+          charts[chartId]=new Chart(ctx,{
+            type:'doughnut',
+            data:{
+              labels:Object.keys(counts),
+              datasets:[{
+                data:Object.values(counts),
+                backgroundColor:Object.keys(counts).map((_,i)=>DCOLORS[i%DCOLORS.length]+'cc'),
+                borderColor:Object.keys(counts).map((_,i)=>DCOLORS[i%DCOLORS.length]),
+                borderWidth:2,hoverOffset:8
+              }]
+            },
+            options:{
+              responsive:true,maintainAspectRatio:false,
+              cutout:'55%',
+              plugins:{
+                legend:{display:false},
+                tooltip:{
+                  callbacks:{
+                    label:ctx2=>`${ctx2.label}: ${ctx2.raw} (${(ctx2.raw/total*100).toFixed(1)}%)`
+                  },
+                  bodyFont:{family:'Tajawal'},titleFont:{family:'Tajawal'}
+                },
+                // data labels plugin fallback — draw manually
+              },
+              animation:{animateRotate:true,duration:800}
+            },
+            plugins:[{
+              id:'doughnutLabels',
+              afterDatasetsDraw(chart){
+                const {ctx:cx,data}=chart;
+                chart.data.datasets.forEach((dataset,i)=>{
+                  const meta=chart.getDatasetMeta(i);
+                  meta.data.forEach((arc,idx)=>{
+                    const val=dataset.data[idx];
+                    if(!val) return;
+                    const {x,y}=arc.tooltipPosition();
+                    cx.save();
+                    cx.fillStyle='#fff';
+                    cx.font='bold 12px Cairo,Tajawal,sans-serif';
+                    cx.textAlign='center';
+                    cx.textBaseline='middle';
+                    cx.fillText(val,x,y);
+                    cx.restore();
+                  });
+                });
+              }
+            }]
+          });
+        });
+      },100);
+    }
   } else demogCont.innerHTML='<p style="color:var(--text3);font-size:13px">لا توجد بيانات كافية</p>';
 
-  if (n < 2) { renderAnalysisEmpty(); return; }
+  if (n < 2) {
+    renderAnalysisEmpty();
+    if(n===0){
+      const el=document.getElementById('axes-analysis-container');
+      if(el) el.innerHTML=`<div style="background:rgba(59,111,240,.05);border:1.5px solid rgba(59,111,240,.2);border-radius:var(--radius);padding:2rem;text-align:center">
+        <div style="font-size:32px;margin-bottom:.75rem">📭</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:.5rem">لا توجد استجابات بعد</div>
+        <div style="font-size:12px;color:var(--text2)">شارك رابط الاستبيان لجمع البيانات</div>
+        <button class="btn btn-primary" style="margin-top:1rem" onclick="showPage('share')">🔗 مشاركة الاستبيان</button>
+      </div>`;
+    }
+    return;
+  }
 
   // Axes analysis — SPSS-style table
   const axesCont = document.getElementById('axes-analysis-container');
@@ -1716,7 +2133,7 @@ function renderAnalysis(){
     <div class="spss-head-title">📊 نتائج تحليل المحاور — One Sample Statistics</div>
   </div><div class="spss-body">
   <div class="tbl-wrap"><table>
-    <thead><tr><th>#</th><th>المحور</th><th>المتغير</th><th>N</th><th>M</th><th>SD</th><th>SE</th><th>الوزن%</th><th>t</th><th>Sig</th><th>المستوى</th></tr></thead><tbody>`;
+    <thead><tr><th>#</th><th>المحور</th><th>الرمز</th><th>N</th><th>المتوسط (M̄)</th><th>الانحراف (SD)</th><th>الخطأ (SE)</th><th>الوزن (%)</th><th>قيمة (t)</th><th>الدلالة (Sig.)</th><th>المستوى</th></tr></thead><tbody>`;
   (survey?.axes||[]).forEach((ax,ai)=>{
     const vals=getAxVals(ai,comp),m=mean(vals),s=stdS(vals,m),se=vals.length>1?s/Math.sqrt(vals.length):0;
     const tt=ttest1(vals,3);
@@ -1751,7 +2168,7 @@ function renderAnalysis(){
     <div class="spss-head-title">📦 نتائج تحليل الأبعاد — One Sample Statistics</div>
   </div><div class="spss-body">
   <div class="tbl-wrap"><table>
-    <thead><tr><th>#</th><th>البعد</th><th>المحور</th><th>الفقرات</th><th>N</th><th>M</th><th>SD</th><th>SE</th><th>الوزن%</th><th>t</th><th>Sig</th><th>الترتيب</th><th>المستوى</th></tr></thead><tbody>`;
+    <thead><tr><th>#</th><th>البعد</th><th>المحور</th><th>الفقرات</th><th>N</th><th>المتوسط (M̄)</th><th>الانحراف (SD)</th><th>الخطأ (SE)</th><th>الوزن (%)</th><th>قيمة T</th><th>Sig</th><th>الترتيب</th><th>المستوى</th></tr></thead><tbody>`;
   const allDimsFlat=[];
   (survey?.axes||[]).forEach((ax,ai)=>(ax.dims||[]).forEach((dim,di)=>{
     const vals=getDimVals(ai,di,comp);allDimsFlat.push({ai,di,ax,dim,vals,m:mean(vals)});
@@ -1790,7 +2207,7 @@ function renderAnalysis(){
   let qHtml='';
   (survey?.axes||[]).forEach((ax,ai) => {
     qHtml+=`<div class="spss-section"><div class="spss-head"><div class="spss-head-title">📋 ${ax.title}</div></div><div class="spss-body">
-    <div class="tbl-wrap"><table><thead><tr><th>رقم</th><th>السؤال</th><th>M</th><th>SD</th><th>الوزن%</th><th>t</th><th>Sig</th><th>المستوى</th></tr></thead><tbody>`;
+    <div class="tbl-wrap"><table><thead><tr><th>الرمز</th><th>نص الفقرة</th><th>المتوسط (M̄)</th><th>الانحراف (SD)</th><th>الوزن (%)</th><th>قيمة T</th><th>Sig</th><th>الترتيب</th><th>المستوى</th></tr></thead><tbody>`;
     (ax.dims||[]).forEach((dim,di) => {
       qHtml+=`<tr><td colspan="8" style="background:var(--bg3);font-weight:700;text-align:right;padding:8px 12px">${dim.title}</td></tr>`;
       (dim.questions||[]).forEach((q,qi) => {
@@ -1847,7 +2264,7 @@ function renderReliability(){
     </div>`;
   });
   html+=`</div></div>
-    <div class="tbl-wrap" style="margin-top:1.5rem"><table><thead><tr><th>البعد</th><th>عدد الفقرات</th><th>M</th><th>SD</th><th>Alpha (α)</th><th>المستوى</th></tr></thead><tbody>`;
+    <div class="tbl-wrap" style="margin-top:1.5rem"><table><thead><tr><th>البعد</th><th>الفقرات (k)</th><th>المتوسط (M̄)</th><th>الانحراف (SD)</th><th>ألفا كرونباخ (α)</th><th>مستوى الثبات</th></tr></thead><tbody>`;
   axes.forEach((ax,ai)=>(ax.dims||[]).forEach((dim,di)=>{
     const vals2D=(dim.questions||[]).map((_,qi)=>getQVals(ai,di,qi,comp)).filter(v=>v.length>=2);
     const a=vals2D.length>=2?cronbach(vals2D):null;
@@ -1928,7 +2345,12 @@ function _buildPearsonMatrix(labels, valsArr, n){
 function renderCorrelation(){
   const comp=getCompleted(),n=comp.length,axes=survey?.axes||[];
   const cont=document.getElementById('correlation-container');
-  if(n<3||axes.length<2){cont.innerHTML='<div class="empty"><h3>يلزم 3 مستجيبين ومحورَين على الأقل</h3></div>';return;}
+  if(n<3){cont.innerHTML='<div class="empty"><h3>يلزم 3 مستجيبين على الأقل</h3></div>';return;}
+  if(axes.length<2){cont.innerHTML=`<div style="background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.3);border-radius:var(--radius);padding:2rem;text-align:center">
+    <div style="font-size:15px;font-weight:700;margin-bottom:.75rem">⚙️ يلزم محورَين على الأقل</div>
+    <div style="font-size:13px;color:var(--text2)">أضف محورَين أو أكثر في بناء الاستبيان</div>
+    <button class="btn btn-primary" style="margin-top:1rem" onclick="showPage('builder')">🔧 بناء الاستبيان</button>
+  </div>`;return;}
   const pR=(r,n2)=>{const t=r*Math.sqrt((n2-2)/(1-r*r+1e-10));return pFromT(t,n2-2);};
 
   // ─── Tabs HTML
@@ -1980,37 +2402,125 @@ function renderCorrelation(){
   }else{html+='<div class="empty"><h3>يلزم بُعدَين على الأقل</h3></div>';}
   html+=`</div></div></div>
 
-  <!-- TAB: Qs X→Y -->
+  <!-- TAB: Qs = CITC + inter-item matrix per dimension -->
   <div id="corr-qs" class="tc">`;
-  xAxes.forEach(xAx=>{
-    const xi=axes.indexOf(xAx);
-    yAxes.forEach(yAx=>{
-      const yi=axes.indexOf(yAx);
-      html+=`<div class="spss-section"><div class="spss-head">
-        <div class="spss-head-title">🔗 ارتباط أسئلة "${xAx.title}" مع متوسط "${yAx.title}"</div></div>
-        <div class="spss-body"><div class="tbl-wrap"><table>
-        <thead><tr><th>#</th><th>نص الفقرة</th><th>r</th><th>r²</th><th>Sig</th><th>الشدة</th></tr></thead><tbody>`;
-      const yVals=getAxVals(yi,comp);
-      (xAx.dims||[]).forEach((dim,di)=>{
-        html+=`<tr><td colspan="6" style="background:var(--bg3);font-weight:700;text-align:right;padding:6px 10px">${dim.title}</td></tr>`;
-        (dim.questions||[]).forEach((q,qi)=>{
-          const qv=getQVals(xi,di,qi,comp);
-          if(!qv.length){html+=`<tr><td>${qi+1}</td><td>${q.text}</td><td colspan="4" style="color:var(--text3)">—</td></tr>`;return;}
-          const r=pearson(qv,yVals.slice(0,qv.length)),p=pR(r,n);
-          const str=Math.abs(r)>=.7?'قوية':Math.abs(r)>=.5?'متوسطة':Math.abs(r)>=.3?'ضعيفة':'ضعيفة جداً';
-          html+=`<tr><td>${qi+1}</td><td style="text-align:right;font-size:11.5px">${q.text}</td>
-            <td style="font-weight:700;color:${Math.abs(r)>=.5?'var(--green)':'var(--amber)'}">${r.toFixed(3)}</td>
-            <td>${(r**2).toFixed(3)}</td><td>${pSig(p)}</td><td>${str}</td></tr>`;
-        });
-      });
-      html+=`</tbody></table></div>
-        <div style="font-size:10px;color:var(--text3);margin-top:6px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>
-      </div></div>`;
-    });
-  });
-  if(!xAxes.length||!yAxes.length) html+='<div class="empty"><h3>حدد محاور X و Y في بناء الاستبيان</h3></div>';
-  html+=`</div>`;
 
+  // ── بناء رمز المتغير: X1,X2... Y1,Y2... ──
+  const axSymbols={};
+  let xi_=0,yi_=0;
+  axes.forEach((ax,ai)=>{
+    if(ax.variable==='X'){xi_++;axSymbols[ai]='X'+xi_;}
+    else if(ax.variable==='Y'){yi_++;axSymbols[ai]='Y'+yi_;}
+    else axSymbols[ai]='M'+(ai+1);
+  });
+
+  // ── لكل محور: اتساق داخلي + مصفوفة ارتباط فقرات البعد ──
+  axes.forEach((ax,ai)=>{
+    const sym=axSymbols[ai];
+    html+=`<div class="spss-section" style="margin-bottom:1.25rem">
+      <div class="spss-head">
+        <div class="spss-head-title">🔗 الاتساق الداخلي وارتباط الفقرات — المحور: ${ax.title} (${sym})</div>
+        <span class="badge ${ax.variable==='X'?'b-blue':ax.variable==='Y'?'b-red':'b-amber'}">${sym}</span>
+      </div><div class="spss-body">`;
+
+    // ── لكل بعد: CITC + مصفوفة ارتباط ──
+    (ax.dims||[]).forEach((dim,di)=>{
+      const qs=dim.questions||[];
+      if(!qs.length) return;
+
+      // اسم الفقرات: X1_1, X1_2 أو Y1_1 ...
+      const qSymbols=qs.map((_,qi)=>`${sym}_${qi+1}`);
+      const qValsArr=qs.map((_,qi)=>getQVals(ai,di,qi,comp));
+
+      // ── جدول CITC ──
+      const totV=comp.map(r=>{let s=0,c2=0;qs.forEach((_,qi)=>{const v=r.answers?.[`${ai}_${di}_${qi}`];if(v){s+=v;c2++;}});return c2?s/c2:0;});
+
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--accent);margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3);border-right:3px solid var(--accent)">
+        البعد: ${dim.title}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">
+        أولاً — صدق الاتساق الداخلي (CITC)</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th>الرمز</th><th>نص الفقرة</th>
+          <th>الارتباط بالبعد (r)</th><th>CITC المصحح</th>
+          <th>Alpha إذا حُذف</th><th>Sig</th><th>الحكم</th>
+        </tr></thead><tbody>`;
+
+      qs.forEach((q,qi)=>{
+        const qv=qValsArr[qi];
+        if(!qv.length){html+=`<tr><td>${qSymbols[qi]}</td><td style="text-align:right">${q.text}</td><td colspan="5" style="color:var(--text3)">—</td></tr>`;return;}
+        const rt=pearson(qv,totV);
+        const corrV=comp.map(r=>{let s=0,c2=0;qs.forEach((_,qi2)=>{if(qi2===qi)return;const v=r.answers?.[`${ai}_${di}_${qi2}`];if(v){s+=v;c2++;}});return c2?s/c2:0;});
+        const rc=pearson(qv,corrV);
+        // alpha if deleted
+        const remainVals=qs.map((_,qi2)=>qi2!==qi?qValsArr[qi2]:[]).filter(a=>a.length);
+        const alpDel=remainVals.length>=2?cronbach(remainVals):null;
+        const p=pR(rc,n);
+        html+=`<tr>
+          <td style="font-weight:700;color:var(--accent)">${qSymbols[qi]}</td>
+          <td style="text-align:right;font-size:11.5px">${q.text}</td>
+          <td>${rt.toFixed(3)}</td>
+          <td style="font-weight:700;color:${rc>=.4?'var(--green)':rc>=.3?'var(--accent)':'var(--red)'}">${rc.toFixed(3)}</td>
+          <td>${alpDel!==null?alpDel.toFixed(3):'—'}</td>
+          <td>${pSig(p)}</td>
+          <td><span class="badge ${rc>=.3?'b-green':'b-red'}">${rc>=.4?'ممتاز ✓':rc>=.3?'مقبول ✓':'ضعيف ✗'}</span></td>
+        </tr>`;
+      });
+      html+=`</tbody></table></div>`;
+
+      // ── مصفوفة الارتباط بين الفقرات ──
+      if(qs.length>=2){
+        html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">ثانياً — مصفوفة الارتباط بين الفقرات (Inter-Item Correlation Matrix)</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th></th>${qSymbols.map(s=>`<th style="color:var(--accent)">${s}</th>`).join('')}</tr></thead>
+          <tbody>`;
+        qs.forEach((_,i)=>{
+          html+=`<tr><td style="font-weight:700;color:var(--accent)">${qSymbols[i]}</td>`;
+          qs.forEach((_,j)=>{
+            if(i===j){html+=`<td style="background:var(--bg4);font-weight:700">1.000</td>`;}
+            else{
+              const r=pearson(qValsArr[i],qValsArr[j]);
+              const p2=pR(r,n);
+              const col=Math.abs(r)>=.6?'var(--green)':Math.abs(r)>=.3?'var(--accent)':'var(--text3)';
+              html+=`<td style="color:${col}">${r.toFixed(3)}<br><small>${sL(p2)}</small></td>`;
+            }
+          });
+          html+=`</tr>`;
+        });
+        html+=`</tbody></table></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:5px">*** p&lt;0.001 | ** p&lt;0.01 | * p&lt;0.05 | ns: غير دال</div>`;
+
+        // ── تفسير CITC ──
+        const citcVals=qs.map((_,qi)=>{
+          const corrV=comp.map(r=>{let s=0,c2=0;qs.forEach((_,qi2)=>{if(qi2===qi)return;const v=r.answers?.[`${ai}_${di}_${qi2}`];if(v){s+=v;c2++;}});return c2?s/c2:0;});
+          return pearson(qValsArr[qi],corrV);
+        });
+        const allPass=citcVals.every(r=>r>=.3);
+        const weakItems=qs.filter((_,qi)=>citcVals[qi]<.3).map((_,qi)=>qSymbols[qi]).join('، ');
+        html+=`<div style="margin-top:.75rem;padding:.75rem 1rem;background:${allPass?'rgba(5,150,105,.05)':'rgba(220,38,38,.05)'};border:1px solid ${allPass?'rgba(5,150,105,.2)':'rgba(220,38,38,.2)'};border-radius:var(--r2);font-size:12px;color:var(--text2);line-height:1.9">
+          <strong>التفسير:</strong> ${allPass
+            ?`جميع فقرات البُعد "${dim.title}" تجاوزت معيار CITC ≥ 0.30، مما يدل على <strong>اتساق داخلي جيد</strong> للبعد وصلاحية جميع الفقرات للقياس.`
+            :`الفقرات (${weakItems}) لم تتجاوز معيار CITC ≥ 0.30، ويُنصح بمراجعتها أو حذفها لتحسين ثبات البُعد.`}
+        </div>`;
+      }
+      html+=`<hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">`;
+    });
+
+    // ── تفسير عام للمحور ──
+    html+=`<div style="padding:.875rem 1.25rem;background:linear-gradient(135deg,rgba(59,111,240,.04),rgba(124,58,237,.02));border-radius:var(--r2);border:1px solid rgba(59,111,240,.1);font-size:12.5px;color:var(--text2);line-height:2">
+      <strong>📌 تفسير عام للمحور (${sym}) — ${ax.title}:</strong><br>
+      تشير نتائج الاتساق الداخلي إلى أن فقرات المحور <strong>${ax.title}</strong> (${sym}) تتمتع بمستوى
+      ${(()=>{const vals2D=(ax.dims||[]).flatMap((d,di)=>(d.questions||[]).map((_,qi)=>getQVals(ai,di,qi,comp))).filter(v=>v.length>=2);const a=vals2D.length>=2?cronbach(vals2D):null;return a!==null?`<strong>جيد من الثبات (α = ${a.toFixed(3)})</strong>، مما يؤكد صلاحية هذا المحور للقياس.`:'من الاتساق الداخلي.'})()}
+    </div>`;
+
+    html+=`</div></div>`;
+  });
+
+  if(!axes.length) html+='<div class="empty"><h3>لا توجد محاور معرَّفة</h3></div>';
+  html+=`<!-- END STEPWISE --></div>`;
+
+  const summarySection=buildRegrSummarySection(xAxes,yAxes,axes,comp);
+  html=html.replace('<!-- END STEPWISE -->',summarySection+'<!-- END STEPWISE -->');
   cont.innerHTML=html;
 
   // Dims heatmap chart
@@ -2039,6 +2549,241 @@ window.corrTab=(id,el)=>{
   document.getElementById('corr-'+id)?.classList.add('active');
   el.classList.add('active');
 };
+
+
+// ══════════════════════════════════════════════════════
+//  جدول ملخص الانحدار الشامل + التفسير (SPSS style)
+// ══════════════════════════════════════════════════════
+function buildRegrSummarySection(xAxes, yAxes, axes, comp){
+  const COLORS=['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626'];
+  let html='';
+
+  yAxes.forEach(yAx=>{
+    const yi=axes.indexOf(yAx);
+    const yv=getAxVals(yi,comp);
+    const n=yv.length;
+    if(n<3) return;
+
+    // ─ Stepwise: build steps ─
+    let candidates=[];
+    xAxes.forEach(xAx=>{
+      const xi=axes.indexOf(xAx);
+      (xAx.dims||[]).forEach((dim,di)=>{
+        const v=getDimVals(xi,di,comp);
+        if(v.length>=3) candidates.push({name:dim.title,axName:xAx.title,vals:v,di});
+      });
+    });
+    if(!candidates.length) xAxes.forEach(xAx=>{candidates.push({name:xAx.title,axName:xAx.title,vals:getAxVals(axes.indexOf(xAx),comp)});});
+
+    let entered=[],remaining=[...candidates],steps=[];
+    for(let s=0;s<Math.min(candidates.length,8)&&remaining.length;s++){
+      let bestF=-Infinity,bestIdx=-1;
+      remaining.forEach((cand,ci)=>{
+        const trial=[...entered.map(e=>e.vals),cand.vals];
+        const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
+        if(res&&res.F>bestF){bestF=res.F;bestIdx=ci;}
+      });
+      if(bestIdx<0) break;
+      const best=remaining[bestIdx];entered.push(best);remaining.splice(bestIdx,1);
+      const trial=entered.map(e=>e.vals);
+      const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
+      if(!res) break;
+      const lastP=res.pB?res.pB[res.pB.length-1]:res.pF;
+      steps.push({step:s+1,var:best.name,axName:best.axName,R2:res.R2,R:res.R,
+        R2adj:1-(1-res.R2)*(n-1)/(n-entered.length-1),
+        F:res.F,pF:res.pF,betas:res.betas||[res.b0,res.b1],
+        bStd:res.bStd||[0],tB:res.tB||[res.t0,res.t1],pB:res.pB||[res.pt0,res.pt1],
+        entered:[...entered],excluded:[...remaining]});
+      if(lastP>0.10) break;
+    }
+
+    if(!steps.length){
+      html+=`<div class="empty"><h3>لا توجد متغيرات دالة إحصائياً للإدراج في النموذج</h3></div>`;
+      return;
+    }
+
+    const finalStep=steps[steps.length-1];
+    const acceptedVars=finalStep.entered.map(e=>e.name);
+    const excludedVars=finalStep.excluded.map(e=>e.name);
+    const R=finalStep.R.toFixed(3),R2=finalStep.R2.toFixed(3),Fv=finalStep.F.toFixed(3),pF=pSig(finalStep.pF);
+    const R2pct=(finalStep.R2*100).toFixed(1);
+
+    html+=`<div class="spss-section" style="margin-bottom:1.5rem">
+      <div class="spss-head">
+        <div class="spss-head-title">📊 جدول ملخص الانحدار — المتغير التابع: ${yAx.title}</div>
+        <span class="badge b-red">Y</span>
+      </div>
+      <div class="spss-body">
+
+      <!-- 1. Variables Entered/Removed -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:.5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 Variables Entered/Removed</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>النموذج</th><th>المتغيرات المدخلة</th><th>المتغيرات المحذوفة</th><th>الطريقة</th></tr></thead>
+        <tbody>
+        ${steps.map((s,i)=>`<tr>
+          <td style="font-weight:700">${i+1}</td>
+          <td style="color:var(--green);font-weight:600">${s.var}</td>
+          <td style="color:var(--red)">${i===steps.length-1&&excludedVars.length?excludedVars.join('، '):'—'}</td>
+          <td><span class="badge b-blue">Stepwise</span></td>
+        </tr>`).join('')}
+        </tbody></table></div>
+
+      <!-- 2. Model Summary -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 Model Summary</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>النموذج (Model)</th><th>معامل الارتباط (R)</th><th>معامل التحديد (R²)</th><th>R² المعدّل</th><th>الخطأ المعياري (SE)</th></tr></thead>
+        <tbody>
+        ${steps.map((s,i)=>{
+          const trial=s.entered.map(e=>e.vals);
+          const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
+          const se=res?Math.sqrt(res.MSres).toFixed(3):'—';
+          return `<tr ${i===steps.length-1?'style="background:rgba(5,150,105,.06);font-weight:700"':''}>
+            <td>${i+1}</td>
+            <td>${s.R.toFixed(3)}</td>
+            <td><strong>${s.R2.toFixed(3)}</strong></td>
+            <td>${s.R2adj.toFixed(3)}</td>
+            <td>${se}</td>
+          </tr>`;
+        }).join('')}
+        </tbody></table></div>
+
+      <!-- 3. ANOVA -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 ANOVA</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>النموذج</th><th>المصدر</th><th>مجموع المربعات (SS)</th><th>درجات الحرية (df)</th><th>متوسط المربعات (MS)</th><th>قيمة (F)</th><th>الدلالة (Sig.)</th></tr></thead>
+        <tbody>
+        ${steps.map((s,i)=>{
+          const trial=s.entered.map(e=>e.vals);
+          const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
+          if(!res) return '';
+          const k2=s.entered.length;
+          return `<tr ${i===steps.length-1?'style="font-weight:700"':''}>
+            <td rowspan="3" style="vertical-align:middle;font-weight:700">${i+1}</td>
+            <td style="color:var(--green)">الانحدار</td>
+            <td>${res.SSreg.toFixed(3)}</td><td>${k2}</td><td>${(res.SSreg/k2).toFixed(3)}</td>
+            <td style="font-weight:700">${res.F.toFixed(3)}</td><td>${pSig(res.pF)}</td></tr>
+          <tr ${i===steps.length-1?'style="font-weight:700"':''}><td>البواقي</td>
+            <td>${res.SSres.toFixed(3)}</td><td>${n-k2-1}</td><td>${res.MSres.toFixed(3)}</td><td>—</td><td>—</td></tr>
+          <tr ${i===steps.length-1?'style="background:var(--bg4);font-weight:700"':''}><td>الكلي</td>
+            <td>${res.SStot.toFixed(3)}</td><td>${n-1}</td><td>—</td><td>—</td>
+            <td><span class="badge ${res.pF<.05?'b-green':'b-amber'}">${res.pF<.05?'دال ✓':'غير دال'}</span></td></tr>`;
+        }).join('')}
+        </tbody></table></div>
+
+      <!-- 4. Coefficients -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 Coefficients</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>النموذج</th><th>المتغير</th><th>B (غير موحّد)</th><th>Std.Error</th><th>Beta (β موحّد)</th><th>قيمة (t)</th><th>الدلالة (Sig.)</th></tr></thead>
+        <tbody>
+        ${steps.map((s,i)=>{
+          const trial=s.entered.map(e=>e.vals);
+          const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
+          if(!res) return '';
+          let rows=`<tr style="${i===steps.length-1?'font-weight:700':''}"><td rowspan="${s.entered.length+1}" style="vertical-align:middle;font-weight:700">${i+1}</td>
+            <td>الثابت (α)</td>
+            <td>${(res.betas||[res.b0])[0].toFixed(3)}</td>
+            <td>${(res.seB||[res.se0])[0].toFixed(3)}</td>
+            <td>—</td>
+            <td>${(res.tB||[res.t0])[0].toFixed(3)}</td>
+            <td>${pSig((res.pB||[res.pt0])[0])}</td></tr>`;
+          s.entered.forEach((e,j)=>{
+            const b=(res.betas||[0,res.b1])[j+1]??0;
+            const se=(res.seB||[0,res.seb])[j+1]??0;
+            const beta=(res.bStd||[0])[j]??0;
+            const t=(res.tB||[0,res.t1])[j+1]??0;
+            const p=(res.pB||[0,res.pt1])[j+1]??1;
+            rows+=`<tr style="${i===steps.length-1?'background:rgba(5,150,105,.04);font-weight:600':''}">
+              <td style="color:var(--accent);font-weight:700">${e.name}</td>
+              <td><strong>${b.toFixed(3)}</strong></td>
+              <td>${se.toFixed(3)}</td>
+              <td style="color:var(--purple);font-weight:700">${beta.toFixed(3)}</td>
+              <td style="font-weight:700">${t.toFixed(3)}</td>
+              <td>${pSig(p)}</td></tr>`;
+          });
+          return rows;
+        }).join('')}
+        </tbody></table></div>
+
+      <!-- 5. Excluded Variables -->
+      ${excludedVars.length?`
+      <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(220,38,38,.04);border-radius:var(--r3)">📋 Excluded Variables</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>المتغير المستبعد</th><th>Beta (β) إن أُدخل</th><th>قيمة (t)</th><th>الدلالة (Sig.)</th><th>سبب الاستبعاد</th></tr></thead>
+        <tbody>
+        ${excludedVars.map(eName=>{
+          const ec=candidates.find(c2=>c2.name===eName);
+          if(!ec) return `<tr><td>${eName}</td><td colspan="4" style="color:var(--text3)">—</td></tr>`;
+          const finalXmat=finalStep.entered.map(e=>e.vals);
+          const resAll=finalXmat.length===1?simpleOLS(finalXmat[0],yv):multipleOLS([...finalXmat,ec.vals],yv);
+          const betaE=resAll&&resAll.bStd?resAll.bStd[resAll.bStd.length-1]:0;
+          const tE=resAll&&resAll.tB?resAll.tB[resAll.tB.length-1]:0;
+          const pE=resAll&&resAll.pB?resAll.pB[resAll.pB.length-1]:1;
+          return `<tr><td style="color:var(--red)">${eName}</td>
+            <td>${betaE.toFixed(3)}</td>
+            <td>${tE.toFixed(3)}</td>
+            <td>${pSig(pE)}</td>
+            <td style="font-size:11px;color:var(--text3)">${pE>=0.10?'p ≥ 0.10 — غير دال':'إدراجه لا يحسّن النموذج'}</td></tr>`;
+        }).join('')}
+        </tbody></table></div>` : ''}
+
+      <!-- 6. جدول ملخص شامل -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(124,58,237,.06);border-radius:var(--r3)">📋 جدول الملخص الشامل</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th>النموذج</th><th>البيان (البعد)</th>
+          <th>قيمة (t)</th><th>Beta (β)</th><th>B</th>
+          <th>R</th><th>R²</th><th>F</th><th>Sig.</th>
+        </tr></thead>
+        <tbody>
+        ${steps.map((s,i)=>`<tr ${i===steps.length-1?'style="background:rgba(5,150,105,.08);font-weight:700"':''}>
+          <td>${i+1}</td>
+          <td style="color:var(--accent);font-weight:700">${s.var}</td>
+          <td>${(s.tB&&s.tB[s.tB.length-1]||0).toFixed(3)}</td>
+          <td style="color:var(--purple)">${(s.bStd&&s.bStd[s.bStd.length-1]||0).toFixed(3)}</td>
+          <td>${(s.betas&&s.betas[s.betas.length-1]||0).toFixed(3)}</td>
+          <td>${s.R.toFixed(3)}</td>
+          <td style="font-weight:700">${s.R2.toFixed(3)}</td>
+          <td>${s.F.toFixed(3)}</td>
+          <td>${pSig(s.pF)}</td>
+        </tr>`).join('')}
+        </tbody></table></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>
+
+      <!-- 7. التفسير الأكاديمي -->
+      ${(()=>{
+        const acc=acceptedVars.join('') && acceptedVars;
+        const excl=excludedVars;
+        const finalB=steps[steps.length-1];
+        const bVal=(finalB.betas&&finalB.betas[finalB.betas.length-1]||0).toFixed(3);
+        const b0Val=(finalB.betas&&finalB.betas[0]||0).toFixed(3);
+        return `<div style="margin-top:1.5rem;padding:1.25rem 1.5rem;background:linear-gradient(135deg,rgba(59,111,240,.04),rgba(124,58,237,.03));border:1px solid rgba(59,111,240,.15);border-radius:var(--r2);font-size:13px;color:var(--text2);line-height:2.1;direction:rtl;text-align:right">
+          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)">📝 تفسير نتائج الانحدار الخطي التدريجي (Stepwise)</div>
+          ${excl.length?`<p>نلاحظ من خلال الجدول أعلاه أنه تم استبعاد ${excl.length===1?`بُعد <strong>(${excl[0]})</strong>`:excl.map(e=>`بُعد <strong>(${e})</strong>`).join(' و')} لضعف الارتباط الجزئي وعدم دلالة تأثيرهم${excl.length>1?'ا':''} على <strong>(${yAx.title})</strong>، بينما تم الإبقاء على ${acc.map(a=>`<strong>(${a})</strong>`).join(' و ')} باعتباره${acc.length>1?'م':''}  المتغير${acc.length>1?'ات':''} الأكثر تأثيرًا في النموذج النهائي.</p>`:''}
+          <p style="margin-top:.75rem">وقد بلغ معامل الارتباط <strong>(R = ${R})</strong>، كما بلغ معامل التحديد <strong>(R² = ${R2})</strong>، أي أن <strong>${R2pct}%</strong> من التباين الحاصل في <strong>(${yAx.title})</strong> يمكن تفسيره من خلال ${acc.map(a=>`<strong>(${a})</strong>`).join(' و ')}.</p>
+          <p style="margin-top:.75rem">كما بلغت قيمة <strong>(F = ${Fv})</strong> وهي ${finalStep.pF<.05?'<strong>أكبر من القيمة الجدولية ودالة إحصائيًا</strong>':'<span style="color:var(--red)">غير دالة إحصائيًا</span>'} عند مستوى الدلالة (α ≤ 0.05)، حيث بلغ مستوى المعنوية <strong>(Sig = ${pF})</strong>.</p>
+          <p style="margin-top:.75rem">وبذلك يمكن التعبير عن معادلة الانحدار كما يلي:</p>
+          <div style="margin:.75rem 0;padding:.875rem 1.25rem;background:var(--bg3);border-radius:var(--r3);font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);text-align:center;direction:ltr">
+            Ŷ = ${b0Val} + ${bVal} × X + eᵢ
+          </div>
+          <ul style="margin:.75rem 0;padding-right:1.25rem;list-style:disc">
+            <li><strong>α (${b0Val})</strong>: ثابت معادلة الانحدار</li>
+            <li><strong>β (${bVal})</strong>: معامل الانحدار</li>
+            <li><strong>Y</strong>: ${yAx.title} (المتغير التابع)</li>
+            <li><strong>X</strong>: ${acc[acc.length-1]||'البعد المقبول'} (البعد المقبول في النموذج)</li>
+            <li><strong>eᵢ</strong>: متغير عشوائي (عوامل أخرى غير مدرجة في النموذج)</li>
+          </ul>
+          <p>وبما أن مستوى المعنوية <strong>(Sig = ${pF})</strong> ${finalStep.pF<.05?'<strong>أقل من مستوى الدلالة (0.05)</strong>، فإننا <span style="color:var(--green)">نرفض الفرضية الصفرية H₀</span> ونقبل الفرضية البديلة H₁ التي تنص على وجود أثر ذي دلالة إحصائية.':'يتجاوز مستوى الدلالة (0.05)، مما يشير إلى عدم وجود أثر دال إحصائياً.'}</p>
+          <div style="margin-top:1rem;padding:.875rem 1rem;background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);border-radius:var(--r3)">
+            <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:.5rem">📊 التحليل الاقتصادي / المهني</div>
+            <p style="font-size:12px;color:var(--text2);line-height:1.9">تشير النتائج إلى أن <strong>${acc[acc.length-1]||'البعد المقبول'}</strong> يمثل البعد الأكثر تأثيرًا في <strong>${yAx.title}</strong>. وتؤكد مساهمة هذا البعد في تفسير <strong>${R2pct}%</strong> من التباين في <strong>${yAx.title}</strong> أهميته ودوره في تعزيز وتحسينه، رغم وجود عوامل أخرى قد تسهم في تفسير الجزء المتبقي من التباين.</p>
+          </div>
+        </div>`;
+      })()}
+
+      </div></div>`;
+  });
+  return html;
+}
 
 // ══════════════════════════════════════════════════════
 //  REGRESSION — Simple + Multiple + Stepwise
@@ -2150,8 +2895,21 @@ function renderRegression(){
   const cont=document.getElementById('regression-container');
   const xAxes=axes.filter(ax=>ax.variable==='X');
   const yAxes=axes.filter(ax=>ax.variable==='Y');
-  if(n<3||!xAxes.length||!yAxes.length){
-    cont.innerHTML='<div class="empty"><h3>يلزم وجود متغير مستقل (X) وتابع (Y) وثلاثة مستجيبين</h3></div>';return;
+  if(n<3){
+    cont.innerHTML='<div class="empty"><h3>يلزم 3 مستجيبين على الأقل لتشغيل تحليل الانحدار</h3></div>';return;
+  }
+  if(!xAxes.length||!yAxes.length){
+    cont.innerHTML=`<div style="background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.3);border-radius:var(--radius);padding:2rem;text-align:center">
+      <div style="font-size:32px;margin-bottom:1rem">⚙️</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:.75rem">يلزم تحديد المتغيرات</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.25rem">
+        لتشغيل تحليل الانحدار، يجب تحديد:<br>
+        <strong style="color:var(--accent)">متغير مستقل (X)</strong> و<strong style="color:var(--red)">متغير تابع (Y)</strong><br>
+        في صفحة <strong>"بناء الاستبيان"</strong> لكل محور
+      </div>
+      <button class="btn btn-primary" onclick="showPage('builder')">🔧 اذهب إلى بناء الاستبيان</button>
+    </div>`;
+    return;
   }
 
   const COLORS=['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626'];
@@ -2184,7 +2942,7 @@ function renderRegression(){
         <div class="spss-body">
           <!-- Model Summary -->
           <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:.5rem">ملخص النموذج — Model Summary</div>
-          <div class="tbl-wrap"><table><thead><tr><th>R</th><th>R²</th><th>R² المعدّل</th><th>Std. Error</th></tr></thead><tbody>
+          <div class="tbl-wrap"><table><thead><tr><th>معامل الارتباط (R)</th><th>معامل التحديد (R²)</th><th>R² المعدّل</th><th>الخطأ المعياري للتقدير</th></tr></thead><tbody>
           <tr><td>${res.R.toFixed(3)}</td><td style="font-weight:700">${res.R2.toFixed(3)}</td>
               <td>${(1-(1-res.R2)*(res.n-1)/(res.n-2)).toFixed(3)}</td>
               <td>${Math.sqrt(res.MSres).toFixed(3)}</td></tr>
@@ -2234,7 +2992,7 @@ function renderRegression(){
         <div class="spss-body">
           <!-- Model Summary -->
           <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">ملخص النموذج — Model Summary</div>
-          <div class="tbl-wrap"><table><thead><tr><th>R</th><th>R²</th><th>R² المعدّل</th><th>Std. Error</th></tr></thead><tbody>
+          <div class="tbl-wrap"><table><thead><tr><th>معامل الارتباط (R)</th><th>معامل التحديد (R²)</th><th>R² المعدّل</th><th>الخطأ المعياري للتقدير</th></tr></thead><tbody>
           <tr><td>${res.R.toFixed(3)}</td><td style="font-weight:700">${res.R2.toFixed(3)}</td>
               <td>${(1-(1-res.R2)*(res.n-1)/(res.n-res.k-1)).toFixed(3)}</td>
               <td>${Math.sqrt(res.MSres).toFixed(3)}</td></tr></tbody></table></div>
@@ -2365,8 +3123,136 @@ function renderRegression(){
     }else{
       html+=`<div class="empty" style="padding:1rem"><h3>لم تُدخَل أي متغيرات (p &gt; 0.10)</h3></div>`;
     }
-    html+=`<div style="font-size:10px;color:var(--text3);margin-top:8px">المصدر: من إعداد الباحث. معيار الإدخال p&lt;0.05، معيار الإخراج p&gt;0.10.</div>
-    </div></div>`;
+    // ── جدول Variables Entered/Removed ──
+    const excludedCands=candidates.filter(c=>!steps.find(s=>s.var===c.name));
+    html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);margin:.875rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">Variables Entered/Removed</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>النموذج</th><th>المتغيرات المُدخَلة</th><th>المتغيرات المُستبعَدة</th><th>الطريقة</th>
+      </tr></thead><tbody>
+      ${steps.map((s,si)=>`<tr style="background:${si%2===0?'transparent':'rgba(59,111,240,.025)'}">
+        <td>${s.step}</td>
+        <td style="color:var(--green);font-weight:700">${s.var}</td>
+        <td style="color:var(--red);font-size:11px">${si===steps.length-1?excludedCands.map(e=>e.name).join('، ')||'—':'—'}</td>
+        <td>Forward Stepwise (F ≥ 3.84)</td>
+      </tr>`).join('')}
+      </tbody></table></div>`;
+
+    html+=`<div style="font-size:10px;color:var(--text3);margin-top:8px">المصدر: من إعداد الباحث. معيار الإدخال p&lt;0.05، معيار الإخراج p&gt;0.10.</div>`;
+
+    // ── جدول Excluded Variables ──
+    if(excludedCands.length){
+      html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">Excluded Variables</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>المتغير</th><th>Beta In</th><th>t</th><th>Sig</th><th>Partial r</th><th>سبب الاستبعاد</th></tr></thead>
+        <tbody>
+        ${excludedCands.map(ec=>{
+          const ecv=ec.vals,yv2=yv;
+          const r=pearson(ecv,yv2);
+          const pr=pR(r,n);
+          const finalBetas=steps.length?steps[steps.length-1].entered:[]; 
+          const beta=r*(stdS(ecv)||1)/(stdS(yv2)||1);
+          return `<tr><td style="color:var(--red);font-weight:700">${ec.name}</td>
+            <td>${beta.toFixed(3)}</td>
+            <td>${(r*Math.sqrt((n-2)/(1-r*r+1e-10))).toFixed(3)}</td>
+            <td>${pSig(pr)}</td>
+            <td>${r.toFixed(3)}</td>
+            <td style="font-size:11px;color:var(--text3)">${pr>=.05?'ضعف الدلالة الإحصائية (p≥0.05)':'ارتباط جزئي ضعيف'}</td></tr>`;
+        }).join('')}
+        </tbody></table></div>`;
+    }
+
+    // ── جدول ملخص شامل للانحدار ──
+    if(steps.length){
+      const finalS=steps[steps.length-1];
+      const finalEntered2=finalS.entered;
+      const finalXmat2=finalEntered2.map(e=>e.vals);
+      const finalRes2=finalXmat2.length===1?simpleOLS(finalXmat2[0],yv):multipleOLS(finalXmat2,yv);
+      const R2final=finalS.R2,Rfinal=Math.sqrt(R2final),Ffinal=finalS.F;
+
+      html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);margin:1.25rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">📋 جدول ملخص نتائج الانحدار الخطي التدريجي</div>
+      <div class="tbl-wrap"><table>
+        <thead>
+          <tr style="background:linear-gradient(135deg,rgba(59,111,240,.12),rgba(124,58,237,.08))">
+            <th>النموذج</th><th>البعد المقبول</th><th>قيمة T</th>
+            <th>β (معياري)</th><th>B (غير معياري)</th>
+            <th>معامل الارتباط R</th><th>معامل التحديد R²</th>
+            <th>قيمة F</th><th>الدلالة Sig</th>
+          </tr>
+        </thead><tbody>
+        ${finalEntered2.map((e,j)=>{
+          const b=finalRes2?.betas?.[j+1]??finalRes2?.b1??0;
+          const beta=finalRes2?.bStd?.[j]??0;
+          const t=finalRes2?.tB?.[j+1]??finalRes2?.t1??0;
+          const sig=finalRes2?.pB?.[j+1]??finalRes2?.pt1??1;
+          return `<tr style="background:${j%2===0?'rgba(59,111,240,.03)':'transparent'}">
+            <td style="font-weight:700">${j+1}</td>
+            <td style="font-weight:700;color:var(--accent)">${e.name}</td>
+            <td style="font-weight:700;color:${Math.abs(t)>2?'var(--green)':'var(--amber)'}">${t.toFixed(3)}</td>
+            <td style="color:var(--purple);font-weight:700">${beta.toFixed(3)}</td>
+            <td>${b.toFixed(3)}</td>
+            <td style="font-weight:700;color:var(--accent)">${Rfinal.toFixed(3)}</td>
+            <td style="font-weight:700;color:var(--purple)">${R2final.toFixed(3)}</td>
+            <td>${Ffinal.toFixed(3)}</td>
+            <td><span class="badge ${finalS.pF<.05?'b-green':'b-amber'}">${pSig(finalS.pF)}</span></td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:var(--bg4);font-weight:700;border-top:2px solid var(--border2)">
+          <td colspan="2">النموذج الكلي</td>
+          <td>—</td><td>—</td><td>${(finalRes2?.betas?.[0]??finalRes2?.b0??0).toFixed(3)}</td>
+          <td>${Rfinal.toFixed(3)}</td><td>${R2final.toFixed(3)}</td>
+          <td>${Ffinal.toFixed(3)}</td>
+          <td><span class="badge ${finalS.pF<.05?'b-green':'b-amber'}">${pSig(finalS.pF)}</span></td>
+        </tr>
+        </tbody></table></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>`;
+
+      // ── التفسير الأكاديمي ──
+      const acceptedDim=finalEntered2[0];
+      const excludedNames=excludedCands.map(e=>e.name);
+      const b0Final=(finalRes2?.betas?.[0]??finalRes2?.b0??0).toFixed(3);
+      const b1Final=(finalRes2?.betas?.[1]??finalRes2?.b1??0).toFixed(3);
+      const betaFinal=(finalRes2?.bStd?.[0]??0).toFixed(3);
+
+      const excl_str=excludedNames.length>=2
+        ? `بُعدَي <strong>"${excludedNames[0]}"</strong> و<strong>"${excludedNames[1]}"</strong>`
+        : excludedNames.length===1
+        ? `بُعد <strong>"${excludedNames[0]}"</strong>`
+        : 'بعض الأبعاد';
+
+      html+=`<div style="margin-top:1.5rem;background:linear-gradient(135deg,rgba(59,111,240,.04),rgba(124,58,237,.03));border:1px solid rgba(59,111,240,.15);border-right:4px solid var(--accent);border-radius:var(--r2);padding:1.25rem 1.5rem">
+        <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:8px">
+          📝 <span>تفسير نتائج الانحدار الخطي التدريجي (Forward Stepwise)</span>
+        </div>
+        <div style="font-size:13px;color:var(--text2);line-height:2;text-align:justify">
+          <p>نلاحظ من خلال الجدول أعلاه أنه تم استبعاد ${excl_str} لضعف الارتباط الجزئي وعدم دلالة تأثيرهما على <strong>"${yAx.title}"</strong>، بينما تم الإبقاء على <strong>"${acceptedDim?.name||'البعد المقبول'}"</strong> باعتباره المتغير الأكثر تأثيراً في النموذج النهائي.</p>
+          <br>
+          <p>وقد بلغ معامل الارتباط <strong>(R = ${Rfinal.toFixed(3)})</strong>، كما بلغ معامل التحديد <strong>(R² = ${R2final.toFixed(3)})</strong>، أي أن <strong>${(R2final*100).toFixed(1)}%</strong> من التباين الحاصل في <strong>"${yAx.title}"</strong> يمكن تفسيره من خلال <strong>"${acceptedDim?.name||''}"</strong>. كما بلغت قيمة <strong>(F = ${Ffinal.toFixed(3)})</strong> وهي أكبر من القيمة الجدولية ودالة إحصائياً عند مستوى الدلالة (α ≤ 0.05)، حيث بلغ مستوى المعنوية <strong>(Sig = ${pSig(finalS.pF)})</strong>.</p>
+          <br>
+          <p>وبذلك يمكن التعبير عن معادلة الانحدار كما يلي:</p>
+          <div style="margin:1rem 0;padding:.875rem 1.25rem;background:rgba(59,111,240,.08);border-radius:var(--r2);text-align:center;font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;color:var(--accent)">
+            Ŷ = ${b0Final} + ${b1Final} × X + e<sub>i</sub>
+          </div>
+          <p style="margin-top:.5rem">حيث أن:</p>
+          <ul style="margin:8px 0 8px 1.5rem;line-height:2">
+            <li><strong>α = ${b0Final}</strong> : ثابت معادلة الانحدار</li>
+            <li><strong>β = ${betaFinal}</strong> : معامل الانحدار الموحّد</li>
+            <li><strong>B = ${b1Final}</strong> : معامل الانحدار غير الموحّد</li>
+            <li><strong>Y</strong> : المتغير التابع "${yAx.title}"</li>
+            <li><strong>X</strong> : البعد المقبول "${acceptedDim?.name||''}"</li>
+            <li><strong>e<sub>i</sub></strong> : متغير عشوائي (عوامل أخرى غير مدرجة)</li>
+          </ul>
+          <p>وبما أن مستوى المعنوية <strong>(Sig = ${pSig(finalS.pF)})</strong> أقل من مستوى الدلالة (0.05)، فإننا <span style="color:var(--green);font-weight:700">نرفض الفرضية الصفرية H₀</span> ونقبل الفرضية البديلة H₁ التي تنص على وجود أثر ذي دلالة إحصائية.</p>
+          <br>
+          <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem">
+            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:.5rem">💡 التحليل الاقتصادي والمهني:</div>
+            <p>تشير النتائج إلى أن <strong>"${acceptedDim?.name||''}"</strong> يمثل البعد الأكثر تأثيراً في <strong>"${yAx.title}"</strong>. وتُؤكد مساهمته في تفسير <strong>${(R2final*100).toFixed(1)}%</strong> من التباين أهميته ودوره في تعزيز وتحسين "${yAx.title}"، رغم وجود عوامل أخرى قد تسهم كذلك في تفسير الجزء المتبقي (<strong>${(100-R2final*100).toFixed(1)}%</strong>) من التباين.</p>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    html+=`</div></div>`;
   });
   html+=`</div>`;
 
@@ -2827,34 +3713,67 @@ function renderDimensions(){
   // Pie chart
   mkChart('dim-pie','doughnut',allDims.map(d=>d.title),allDims.map(d=>parseFloat((d.m/5*100).toFixed(1))),{extra:{cutout:'55%'}});
 
-  // Per-dim cards
+  // Per-dim cards — with academic interpretation
   let cardsHtml='';
+
+  // ── رموز المتغيرات ──
+  const _axSymbols={};let _xi=0,_yi=0;
+  axes.forEach((ax,ai)=>{if(ax.variable==='X'){_xi++;_axSymbols[ai]='X'+_xi;}else if(ax.variable==='Y'){_yi++;_axSymbols[ai]='Y'+_yi;}else _axSymbols[ai]='M'+(ai+1);});
+
   axes.forEach((ax,ai)=>{
     (ax.dims||[]).forEach((dim,di)=>{
       const vals=getDimVals(ai,di,comp),m=mean(vals),sd=stdS(vals,m),tt=ttest1(vals,3);
-      const qRows=(dim.questions||[]).map((q,qi)=>{
+      const sym=_axSymbols[ai];
+
+      // ترتيب الفقرات
+      const qDataArr=(dim.questions||[]).map((q,qi)=>{
         const qv=getQVals(ai,di,qi,comp),qm=mean(qv),qsd=stdS(qv,qm),qtt=ttest1(qv,3);
-        return `<tr><td>${qi+1}</td><td style="text-align:right;font-size:11.5px">${q.text}</td>
+        return {q,qi,qm,qsd,qtt,qv,sym:`${sym}_${qi+1}`};
+      });
+      const qSorted=[...qDataArr].sort((a,b)=>b.qm-a.qm);
+
+      const qRows=qDataArr.map(({q,qi,qm,qsd,qtt,sym:qSym},idx)=>{
+        const rank=qSorted.findIndex(x=>x.qi===qi)+1;
+        const lvl=agLevel(qm);const bc=lvl==='مرتفع جداً'||lvl==='مرتفع'?'b-green':lvl==='متوسط'?'b-amber':'b-red';
+        return `<tr style="background:${idx%2===0?'transparent':'rgba(59,111,240,.025)'}">
+          <td style="font-weight:700;color:var(--accent)">${qSym}</td>
+          <td style="text-align:right;font-size:11.5px">${q.text}</td>
           <td><strong>${qm.toFixed(3)}</strong></td><td>${qsd.toFixed(3)}</td>
           <td>${(qm/5*100).toFixed(1)}%</td><td>${qtt.t.toFixed(3)}</td><td>${pSig(qtt.p)}</td>
-          <td><span class="badge ${agLevel(qm)==='مرتفع جداً'||agLevel(qm)==='مرتفع'?'b-green':agLevel(qm)==='متوسط'?'b-amber':'b-red'}">${agLevel(qm)}</span></td></tr>`;
+          <td style="font-weight:700">${rank}</td>
+          <td><span class="badge ${bc}">${lvl}</span></td></tr>`;
       }).join('');
+
+      // ── تفسير وصفي أكاديمي ──
+      const first=qSorted[0],last=qSorted[qSorted.length-1];
+      const interpretation=`يوضح الجدول نتائج البعد <strong>"${dim.title}"</strong>، حيث بلغ المتوسط الحسابي الكلي <strong>(M̄ = ${m.toFixed(3)})</strong> والانحراف المعياري <strong>(SD = ${sd.toFixed(3)})</strong>، بوزن نسبي قدره <strong>(${(m/5*100).toFixed(1)}%)</strong>، مما يدل على أن مستوى الاتفاق لدى أفراد العينة كان <strong>${agLevel(m)}</strong>. كما بلغت قيمة <strong>T = ${tt.t.toFixed(3)}</strong> عند مستوى دلالة <strong>(Sig = ${pSig(tt.p)})</strong>${tt.p<.05?'، وهو أقل من 0.05، مما يؤكد الدلالة الإحصائية لهذا البعد.':'.'}
+      ${first?`<br>جاءت الفقرة <strong>(${first.sym} — ${first.q.text.substring(0,60)}...)</strong> في المرتبة الأولى بمتوسط حسابي بلغ <strong>(${first.qm.toFixed(3)})</strong> وانحراف معياري <strong>(${first.qsd.toFixed(3)})</strong> ووزن نسبي <strong>(${(first.qm/5*100).toFixed(1)}%)</strong>، مما يعكس درجة اتفاق <strong>${agLevel(first.qm)}</strong> لدى أفراد العينة.`:''}
+      ${last&&qSorted.length>1?`<br>في حين جاءت الفقرة <strong>(${last.sym} — ${last.q.text.substring(0,60)}...)</strong> في المرتبة الأخيرة بمتوسط حسابي بلغ <strong>(${last.qm.toFixed(3)})</strong> ووزن نسبي <strong>(${(last.qm/5*100).toFixed(1)}%)</strong>، وهو ما يشير إلى مستوى اتفاق <strong>${agLevel(last.qm)}</strong>.`:''}`;
+
       const chartId=`dc-${ai}-${di}`;
-      cardsHtml+=`<div class="dim-card" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:1.25rem;box-shadow:var(--shadow);overflow:hidden">
+      const lvl=agLevel(m);const bc=lvl==='مرتفع جداً'||lvl==='مرتفع'?'b-green':lvl==='متوسط'?'b-amber':'b-red';
+      cardsHtml+=`<div class="dim-card" style="background:var(--bg2);border:1.5px solid var(--border);border-top:3px solid var(--accent);border-radius:var(--radius);margin-bottom:1.5rem;box-shadow:var(--shadow);overflow:hidden">
         <div style="padding:1rem 1.5rem;background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.03));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-          <div style="font-size:14px;font-weight:700">${dim.title}</div>
-          <span class="badge b-blue">${ax.title}</span>
+          <div>
+            <div style="font-size:14px;font-weight:700">${dim.title}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">${ax.title} • رمز المتغير: <strong style="color:var(--accent)">${sym}</strong></div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge ${ax.variable==='X'?'b-blue':ax.variable==='Y'?'b-red':'b-amber'}">${sym}</span>
+            <span class="badge ${bc}">${lvl}</span>
+          </div>
         </div>
         <div style="padding:1.25rem">
-          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:1rem">
-            <div style="background:var(--bg3);border-radius:var(--r2);padding:.625rem .875rem;text-align:center"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:var(--accent)">${m.toFixed(3)}</div><div style="font-size:9px;color:var(--text3)">M</div></div>
-            <div style="background:var(--bg3);border-radius:var(--r2);padding:.625rem .875rem;text-align:center"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:var(--purple)">${sd.toFixed(3)}</div><div style="font-size:9px;color:var(--text3)">SD</div></div>
-            <div style="background:var(--bg3);border-radius:var(--r2);padding:.625rem .875rem;text-align:center"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:var(--green)">${(m/5*100).toFixed(1)}%</div><div style="font-size:9px;color:var(--text3)">الوزن</div></div>
-            <div style="background:var(--bg3);border-radius:var(--r2);padding:.625rem .875rem;text-align:center"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:${tt.p<.05?'var(--green)':'var(--amber)'}">${tt.t.toFixed(3)}</div><div style="font-size:9px;color:var(--text3)">t</div></div>
+          <!-- KPIs -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.25rem">
+            <div style="background:rgba(59,111,240,.07);border:1px solid rgba(59,111,240,.2);border-radius:var(--r2);padding:.625rem .875rem;text-align:center;min-width:80px"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:var(--accent)">${m.toFixed(3)}</div><div style="font-size:9px;color:var(--text3);font-weight:700;margin-top:2px">المتوسط (M̄)</div></div>
+            <div style="background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.2);border-radius:var(--r2);padding:.625rem .875rem;text-align:center;min-width:80px"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:var(--purple)">${sd.toFixed(3)}</div><div style="font-size:9px;color:var(--text3);font-weight:700;margin-top:2px">الانحراف (SD)</div></div>
+            <div style="background:rgba(5,150,105,.07);border:1px solid rgba(5,150,105,.2);border-radius:var(--r2);padding:.625rem .875rem;text-align:center;min-width:80px"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:var(--green)">${(m/5*100).toFixed(1)}%</div><div style="font-size:9px;color:var(--text3);font-weight:700;margin-top:2px">الوزن (%)</div></div>
+            <div style="background:${tt.p<.05?'rgba(5,150,105,.07)':'rgba(217,119,6,.07)'};border:1px solid ${tt.p<.05?'rgba(5,150,105,.2)':'rgba(217,119,6,.2)'};border-radius:var(--r2);padding:.625rem .875rem;text-align:center;min-width:80px"><div style="font-size:20px;font-weight:900;font-family:'Cairo',sans-serif;color:${tt.p<.05?'var(--green)':'var(--amber)'}">${tt.t.toFixed(3)}</div><div style="font-size:9px;color:var(--text3)">t</div></div>
             <div style="display:flex;align-items:center"><span class="badge ${agLevel(m)==='مرتفع جداً'||agLevel(m)==='مرتفع'?'b-green':agLevel(m)==='متوسط'?'b-amber':'b-red'}">${agLevel(m)}</span></div>
           </div>
           <div class="charts-2" style="margin-bottom:1rem">
-            <div class="tbl-wrap"><table><thead><tr><th>رقم</th><th>العبارة</th><th>M</th><th>SD</th><th>الوزن%</th><th>t</th><th>Sig</th><th>المستوى</th></tr></thead><tbody>
+            <div class="tbl-wrap"><table><thead><tr><th>الرمز</th><th>العبارة</th><th>المتوسط (M̄)</th><th>الانحراف (SD)</th><th>الوزن%</th><th>قيمة t</th><th>الدلالة</th><th>المستوى</th></tr></thead><tbody>
             ${qRows}
             <tr style="background:var(--bg4);font-weight:700"><td colspan="2">المتوسط الكلي</td><td>${m.toFixed(3)}</td><td>${sd.toFixed(3)}</td><td>${(m/5*100).toFixed(1)}%</td><td>${tt.t.toFixed(3)}</td><td>${pSig(tt.p)}</td><td><span class="badge ${agLevel(m)==='مرتفع جداً'||agLevel(m)==='مرتفع'?'b-green':agLevel(m)==='متوسط'?'b-amber':'b-red'}">${agLevel(m)}</span></td></tr>
             </tbody></table></div>
@@ -2992,78 +3911,242 @@ function buildContextSummary(){
   return summary;
 }
 
-window.quickPrompt=(prompt)=>{
-  document.getElementById('chat-input').value=prompt;
+// ══════════════════════════════════════════════════════
+//  AI CHAT — Gemini · Groq · OpenRouter
+// ══════════════════════════════════════════════════════
+let AI_PROVIDER = localStorage.getItem('ai_provider') || 'gemini';
+
+const AI_PROVIDERS = {
+  gemini: {
+    name:'Gemini', icon:'✨',
+    hint:'مجاني — من: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com</a>',
+    models:'gemini-2.0-flash (افتراضي)',
+    call: async (key, system, msg) => {
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+        { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ contents:[{role:'user',parts:[{text: system+'\n\n'+msg}]}],
+            generationConfig:{maxOutputTokens:2000} }) }
+      );
+      const d = await r.json();
+      if(d.error) throw new Error(d.error.message);
+      return d.candidates?.[0]?.content?.parts?.[0]?.text || 'لا توجد إجابة';
+    }
+  },
+  groq: {
+    name:'Groq', icon:'⚡',
+    hint:'مجاني وسريع جداً — من: <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent)">console.groq.com</a>',
+    models:'llama-3.3-70b-versatile (افتراضي)',
+    call: async (key, system, msg) => {
+      const r = await fetch('https://api.groq.com/openai/v1/chat/completions',
+        { method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+          body: JSON.stringify({ model:'llama-3.3-70b-versatile', max_tokens:2000,
+            messages:[{role:'system',content:system},{role:'user',content:msg}] }) }
+      );
+      const d = await r.json();
+      if(d.error) throw new Error(d.error.message);
+      return d.choices?.[0]?.message?.content || 'لا توجد إجابة';
+    }
+  },
+  openrouter: {
+    name:'OpenRouter', icon:'🌐',
+    hint:'من: <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--accent)">openrouter.ai</a> — يدعم نماذج متعددة مجانية',
+    models:'google/gemini-2.0-flash-exp:free (افتراضي)',
+    call: async (key, system, msg) => {
+      const r = await fetch('https://openrouter.ai/api/v1/chat/completions',
+        { method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,
+            'HTTP-Referer':'https://anouar-dah.github.io','X-Title':'Survey Platform'},
+          body: JSON.stringify({ model:'google/gemini-2.0-flash-exp:free', max_tokens:2000,
+            messages:[{role:'system',content:system},{role:'user',content:msg}] }) }
+      );
+      const d = await r.json();
+      if(d.error) throw new Error(JSON.stringify(d.error));
+      return d.choices?.[0]?.message?.content || 'لا توجد إجابة';
+    }
+  }
+};
+
+window.selectProvider = (p) => {
+  AI_PROVIDER = p;
+  localStorage.setItem('ai_provider', p);
+  ['gemini','groq','openrouter'].forEach(k => {
+    const btn = document.getElementById('prov-'+k);
+    if(btn){ btn.className = k===p ? 'btn btn-primary' : 'btn btn-ghost'; btn.style.borderRadius='20px'; }
+  });
+  const prov = AI_PROVIDERS[p];
+  if(!prov) return;
+  const hintEl  = document.getElementById('ai-provider-hint');
+  const modelEl = document.getElementById('ai-provider-models');
+  const keyEl   = document.getElementById('ai-key-input');
+  const statusEl= document.getElementById('ai-status');
+  if(hintEl)  hintEl.innerHTML = prov.hint;
+  if(modelEl) modelEl.innerHTML = `النماذج المتاحة: <strong>${prov.models}</strong>`;
+  const stored = localStorage.getItem('ai_key_'+p)||'';
+  if(keyEl)   keyEl.value = stored;
+  if(statusEl)statusEl.textContent = stored ? (prov.icon+' مفتاح محفوظ ✓') : 'غير متصل';
+};
+
+window.saveAIKey = (val) => {
+  localStorage.setItem('ai_key_'+AI_PROVIDER, val.trim());
+  const statusEl = document.getElementById('ai-status');
+  if(statusEl) statusEl.textContent = val.trim() ? (AI_PROVIDERS[AI_PROVIDER]?.icon+' مفتاح محفوظ ✓') : 'غير متصل';
+};
+
+function _addChatBubble(id, isUser, content){
+  const msgs = document.getElementById('chat-messages');
+  if(!msgs) return;
+  if(isUser){
+    msgs.innerHTML += `<div style="display:flex;gap:10px;flex-direction:row-reverse;margin-bottom:4px">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">👤</div>
+      <div style="max-width:82%;padding:10px 16px;border-radius:16px 4px 16px 16px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:13px;line-height:1.8">${content}</div>
+    </div>`;
+  } else {
+    msgs.innerHTML += `<div id="${id}" style="display:flex;gap:10px;align-items:flex-start;margin-bottom:4px">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:14px">🤖</div>
+      <div class="ai-bubble" style="max-width:82%;padding:12px 16px;border-radius:4px 16px 16px 16px;background:var(--bg3);border:1.5px solid var(--border);font-size:13px;line-height:1.9;color:var(--text2)">${content}</div>
+    </div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+window.quickPrompt = (prompt) => {
+  const inp = document.getElementById('chat-input');
+  if(inp){ inp.value = prompt; inp.focus(); }
   sendChat();
 };
 
-window.clearChat=()=>{
-  document.getElementById('chat-messages').innerHTML=`<div style="text-align:center;padding:2rem;color:var(--text3)"><div style="font-size:36px;margin-bottom:12px">🤖</div><div style="font-size:14px;font-weight:700;color:var(--text2)">مساعد البحث الأكاديمي</div></div>`;
+window.clearChat = () => {
+  const msgs = document.getElementById('chat-messages');
+  if(msgs) msgs.innerHTML = `<div style="text-align:center;padding:2.5rem;color:var(--text3)">
+    <div style="font-size:40px;margin-bottom:12px">🤖</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text2)">مساعد البحث الأكاديمي</div>
+    <div style="font-size:12px;margin-top:6px;line-height:1.8">اختر مزوّد AI واضغط على أحد الأزرار أعلاه</div>
+  </div>`;
 };
 
-window.sendChat=async()=>{
-  const input=document.getElementById('chat-input');
-  const msg=input.value.trim();
-  if(!msg)return;
-  const key=localStorage.getItem('claude_key')||document.getElementById('claude-key')?.value?.trim();
-  if(!key){toast('أضف مفتاح Claude API أولاً','err');return;}
+window.sendChat = async () => {
+  const input = document.getElementById('chat-input');
+  const msg = input?.value?.trim();
+  if(!msg) return;
 
-  const msgs=document.getElementById('chat-messages');
-  // User bubble
-  msgs.innerHTML+=`<div style="display:flex;gap:10px;flex-direction:row-reverse">
-    <div style="width:32px;height:32px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;flex-shrink:0">👤</div>
-    <div style="max-width:80%;padding:10px 14px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:13px;line-height:1.7">${msg}</div>
-  </div>`;
-  input.value='';msgs.scrollTop=msgs.scrollHeight;
-
-  // AI bubble with spinner
-  const aiId='ai-msg-'+Date.now();
-  msgs.innerHTML+=`<div id="${aiId}" style="display:flex;gap:10px">
-    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff">🤖</div>
-    <div style="max-width:80%;padding:10px 14px;border-radius:14px;background:var(--bg3);border:1px solid var(--border);font-size:13px;line-height:1.7;color:var(--text2)">
-      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:glow .8s infinite"></span>
-      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:glow .8s .2s infinite;margin:0 2px"></span>
-      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:glow .8s .4s infinite"></span>
-    </div>
-  </div>`;
-  msgs.scrollTop=msgs.scrollHeight;
-
-  try{
-    document.getElementById('ai-status').textContent='يكتب...';
-    const contextSummary=buildContextSummary();
-    const systemPrompt=`أنت مساعد بحثي أكاديمي متخصص في تحليل وتفسير نتائج الاستبيانات الإحصائية. أجب دائماً بالعربية بأسلوب أكاديمي مناسب للمذكرات الجامعية. إليك ملخص بيانات الدراسة:\n${contextSummary}`;
-
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:systemPrompt,messages:[{role:'user',content:msg}]})
-    });
-    const data=await resp.json();
-    const reply=data.content?.[0]?.text||'لم أتمكن من الحصول على إجابة.';
-    const el=document.getElementById(aiId);
-    if(el)el.querySelector('div:last-child').innerHTML=reply.replace(/\n/g,'<br>')+
-      `<div style="margin-top:8px"><button style="font-size:10px;padding:2px 8px;border-radius:20px;border:none;background:rgba(59,111,240,.1);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif" onclick="navigator.clipboard.writeText(this.parentElement.previousElementSibling?.innerText||'').then(()=>toast('✅ تم النسخ','ok'))">📋 نسخ</button></div>`;
-    document.getElementById('ai-status').textContent='متصل ✓';
-  }catch(e){
-    const el=document.getElementById(aiId);
-    if(el)el.querySelector('div:last-child').textContent='حدث خطأ: '+e.message;
-    document.getElementById('ai-status').textContent='خطأ';
-    toast('فشل الاتصال بـ Claude API','err');
+  const key = localStorage.getItem('ai_key_'+AI_PROVIDER) || document.getElementById('ai-key-input')?.value?.trim();
+  if(!key){
+    toast('أضف مفتاح '+( AI_PROVIDERS[AI_PROVIDER]?.name||'AI' )+' أولاً','err');
+    return;
   }
-  msgs.scrollTop=msgs.scrollHeight;
+
+  _addChatBubble(null, true, msg.replace(/</g,'&lt;'));
+  if(input) input.value = '';
+
+  const aiId = 'ai-msg-'+Date.now();
+  _addChatBubble(aiId, false,
+    `<span style="display:inline-flex;gap:5px;align-items:center">
+      <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);animation:glow .8s infinite;display:inline-block"></span>
+      <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);animation:glow .8s .28s infinite;display:inline-block"></span>
+      <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);animation:glow .8s .56s infinite;display:inline-block"></span>
+    </span>`);
+
+  const statusEl = document.getElementById('ai-status');
+  if(statusEl) statusEl.textContent = 'يكتب...';
+
+  const contextSummary = buildContextSummary();
+  const systemPrompt = `أنت مساعد بحثي أكاديمي متخصص في تحليل وتفسير نتائج الاستبيانات الإحصائية. أجب دائماً باللغة العربية بأسلوب أكاديمي مناسب لرسائل الماستر والدكتوراه. استخدم المصطلحات الإحصائية الصحيحة وقدّم تحليلاً مفصّلاً ودقيقاً.\n\nبيانات الدراسة الحالية:\n${contextSummary}`;
+
+  try {
+    const reply = await AI_PROVIDERS[AI_PROVIDER].call(key, systemPrompt, msg);
+    const el = document.getElementById(aiId);
+    if(el){
+      const bubble = el.querySelector('.ai-bubble');
+      if(bubble){
+        const formatted = reply
+          .replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g,'<em>$1</em>')
+          .replace(/\n/g,'<br>');
+        bubble.innerHTML = formatted +
+          `<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:6px">
+            <button style="font-size:10px;padding:3px 10px;border-radius:20px;border:none;background:rgba(59,111,240,.1);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif"
+              onclick="navigator.clipboard.writeText(this.closest('.ai-bubble').innerText.split('نسخ')[0].trim()).then(()=>toast('✅ تم النسخ','ok'))">📋 نسخ</button>
+          </div>`;
+      }
+    }
+    if(statusEl) statusEl.textContent = (AI_PROVIDERS[AI_PROVIDER]?.icon||'✓')+' '+AI_PROVIDERS[AI_PROVIDER]?.name+' ✓';
+  } catch(e) {
+    const el = document.getElementById(aiId);
+    if(el){ const b=el.querySelector('.ai-bubble'); if(b) b.innerHTML=`<span style="color:var(--red)">❌ خطأ في الاتصال: ${e.message}</span><br><span style="font-size:11px;color:var(--text3)">تحقق من صحة المفتاح واتصالك بالإنترنت</span>`; }
+    if(statusEl) statusEl.textContent = 'خطأ ❌';
+    toast('خطأ: '+e.message,'err');
+  }
 };
 
+window.aiAutoAnalyze = async () => {
+  const key = localStorage.getItem('ai_key_'+AI_PROVIDER);
+  if(!key){ toast('أضف مفتاح AI أولاً في صفحة "مساعد AI"','err'); showPage('aichat'); return; }
+  const comp=getCompleted(), n=comp.length, axes=survey?.axes||[];
+  if(!n){ toast('لا توجد استجابات بعد','err'); return; }
+
+  let allVals2D=[];
+  axes.forEach((ax,ai)=>(ax.dims||[]).forEach((d,di)=>(d.questions||[]).forEach((_,qi)=>{const v=getQVals(ai,di,qi,comp);if(v.length>=2)allVals2D.push(v);})));
+  const alpha = allVals2D.length>=2 ? cronbach(allVals2D) : null;
+  const axMeans = axes.map((_,ai)=>mean(getAxVals(ai,comp)));
+
+  const prompt = `بناءً على نتائج دراسة "${survey?.title||'البحث'}" (ن = ${n} مستجيب):
+المحاور ومتوسطاتها:
+${axes.map((ax,i)=>`- ${ax.title} (${ax.variable||''}): M=${axMeans[i].toFixed(3)}, مستوى=${agLevel(axMeans[i])}`).join('\n')}
+معامل الثبات ألفا كرونباخ = ${alpha?alpha.toFixed(3):'غير متاح'}
+
+المطلوب: اكتب تحليلاً أكاديمياً شاملاً للفصل الرابع يشمل:
+١. تفسير نتائج كل محور مع الإحصاء الوصفي
+٢. تفسير معامل الثبات
+٣. أبرز النتائج والاستنتاجات
+٤. توصيات مقترحة (5 توصيات على الأقل)
+٥. خاتمة`;
+
+  showPage('aichat');
+  setTimeout(()=>{
+    const inp=document.getElementById('chat-input');
+    if(inp) inp.value=prompt;
+    sendChat();
+  }, 400);
+};
+
+
+window.autoFillFirebase = () => {
+  const config = {
+    apiKey: "AIzaSyB5ivtHu4iNCz-F9HQXoSCT4j2UaG9_ICw",
+    authDomain: "survey-ai-project-3f4b8.firebaseapp.com",
+    databaseURL: "https://survey-ai-project-3f4b8-default-rtdb.firebaseio.com",
+    projectId: "survey-ai-project-3f4b8",
+    storageBucket: "survey-ai-project-3f4b8.firebasestorage.app",
+    messagingSenderId: "719850463901",
+    appId: "1:719850463901:web:465e26dd9974c70f082a74",
+    measurementId: "G-2HS5E941FP"
+  };
+  const fbEl = document.getElementById('fb-config');
+  if(fbEl) fbEl.value = JSON.stringify(config, null, 2);
+  const msgEl = document.getElementById('fb-status-msg');
+  if(msgEl) msgEl.innerHTML = '<span style="color:var(--green)">✅ تم ملء إعدادات مشروعك. اضغط "حفظ وتطبيق".</span>';
+  toast('✅ تم ملء إعدادات Firebase','ok');
+};
 
 async function init(){
   checkAuth();
   initTheme();
 
-  // Restore settings fields
-  const fbCfg=localStorage.getItem('firebase_config');
-  if(fbCfg)document.getElementById('fb-config').value=fbCfg;
-  const ck=localStorage.getItem('claude_key');
-  const ckEl=document.getElementById('claude-key');
-  if(ck&&ckEl)ckEl.value=ck;
+  // Restore Firebase config
+  const fbCfg = localStorage.getItem('firebase_config');
+  if(fbCfg && document.getElementById('fb-config'))
+    document.getElementById('fb-config').value = fbCfg;
+
+  // Auto-embed Firebase config if missing
+  if(!fbCfg) {
+    try { autoFillFirebase(); } catch(e){}
+  }
+
+  // Initialize AI provider UI
+  try { selectProvider(localStorage.getItem('ai_provider')||'gemini'); } catch(e){}
 
   loadSurveyFromStorage();
   loadResponsesFromStorage();
@@ -3072,8 +4155,7 @@ async function init(){
 
   updateHeaderTitle();
   renderDashboard();
-
-  document.getElementById('sb-resp-count').textContent=respondents.length;
+  document.getElementById('sb-resp-count').textContent = respondents.length;
 }
 init();
 
