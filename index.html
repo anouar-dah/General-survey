@@ -285,34 +285,51 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min
   <button class="btn btn-primary" id="btn-next" onclick="nextStep()">التالي ←</button>
 </div>
 
-<script type="module">
-// ═══════════════════════════════════════
-//  FIREBASE (optional — graceful fallback)
-// ═══════════════════════════════════════
+<script>
+// ════════════════════════════════════════════
+//  FIREBASE CONFIG — مضمّن مباشرة (لا يحتاج إعداداً)
+// ════════════════════════════════════════════
+const FIREBASE_CFG = {
+  apiKey: "AIzaSyB5ivtHu4iNCz-F9HQXoSCT4j2UaG9_ICw",
+  authDomain: "survey-ai-project-3f4b8.firebaseapp.com",
+  databaseURL: "https://survey-ai-project-3f4b8-default-rtdb.firebaseio.com",
+  projectId: "survey-ai-project-3f4b8",
+  storageBucket: "survey-ai-project-3f4b8.firebasestorage.app",
+  messagingSenderId: "719850463901",
+  appId: "1:719850463901:web:465e26dd9974c70f082a74"
+};
+// احفظ في localStorage للـ admin أيضاً
+localStorage.setItem('firebase_config', JSON.stringify(FIREBASE_CFG));
+
 let db = null;
+
 async function initFirebase() {
-  const cfg = localStorage.getItem('firebase_config');
-  if (!cfg) { console.log('No Firebase config'); return; }
   try {
     const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { getDatabase, ref, push, set, get, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-    let parsedCfg;
-    try { parsedCfg = JSON.parse(cfg); } catch(e){ return; }
-    const appName = 'survey-app';
+    const { getDatabase, ref, push, set, get } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+    const appName = 'survey-index';
     const existing = getApps().find(a => a.name === appName);
-    const app = existing || initializeApp(parsedCfg, appName);
+    const app = existing || initializeApp(FIREBASE_CFG, appName);
     const database = getDatabase(app);
-    db = { ref, push, set, get, onValue, db: database };
-    // دائماً اقرأ survey من Firebase (يُغلب localStorage)
+    db = { ref, push, set, get, db: database };
+
+    // اقرأ survey من Firebase مباشرةً
     try {
-      const surveySnap = await get(ref(database, 'survey'));
-      if (surveySnap.exists() && surveySnap.val()?.title) {
-        const fbSurvey = surveySnap.val();
+      const snap = await get(ref(database, 'survey'));
+      if (snap.exists() && snap.val()?.title) {
+        const fbSurvey = snap.val();
         localStorage.setItem('survey_config', JSON.stringify(fbSurvey));
-        console.log('Survey loaded from Firebase:', fbSurvey.title);
+        console.log('✅ Survey loaded from Firebase:', fbSurvey.title);
+        return true; // نجح
       }
-    } catch(e){ console.warn('Survey fetch error:', e); }
-  } catch(e) { console.warn('Firebase init failed:', e); }
+    } catch(e) {
+      console.warn('Firebase read error (check Rules):', e.message);
+    }
+    return false;
+  } catch(e) {
+    console.warn('Firebase init failed:', e.message);
+    return false;
+  }
 }
 
 // ═══════════════════════════════════════
@@ -719,7 +736,7 @@ function updateProgress(){
 }
 
 // ═══════════════════════════════════════
-//  SUBMIT
+//  SUBMIT — يحفظ محلياً أولاً دائماً ثم يرفع لـ Firebase
 // ═══════════════════════════════════════
 async function submitSurvey(){
   const btn = document.getElementById('btn-next');
@@ -734,34 +751,51 @@ async function submitSurvey(){
     userAgent: navigator.userAgent.substring(0, 80)
   };
 
+  // ── الخطوة 1: احفظ محلياً دائماً كـ backup ──
   try {
-    if (db) {
+    const saved = JSON.parse(localStorage.getItem('offline_submissions') || '[]');
+    saved.push(submission);
+    localStorage.setItem('offline_submissions', JSON.stringify(saved));
+  } catch(e){ console.warn('Local save failed:', e); }
+
+  // ── الخطوة 2: ارفع لـ Firebase ──
+  let fbOk = false;
+  if (db) {
+    try {
       const { ref, push, set, get } = db;
       await push(ref(db.db, 'submissions'), submission);
-      const metaRef = ref(db.db, 'meta/count');
-      const snap = await get(metaRef);
-      await set(metaRef, (snap.val() || 0) + 1);
-    } else {
-      const saved = JSON.parse(localStorage.getItem('offline_submissions') || '[]');
-      saved.push(submission);
-      localStorage.setItem('offline_submissions', JSON.stringify(saved));
+      // احذف من offline بعد النجاح
+      try {
+        const ls = JSON.parse(localStorage.getItem('offline_submissions')||'[]');
+        const filtered = ls.filter(r => r.submittedAt !== submission.submittedAt);
+        localStorage.setItem('offline_submissions', JSON.stringify(filtered));
+      } catch(e){}
+      fbOk = true;
+    } catch(fbErr) {
+      console.warn('Firebase push failed, saved offline:', fbErr);
+      // البيانات محفوظة محلياً — اعرض نجاح مع تنبيه
     }
-    showSuccess();
-  } catch(e) {
-    console.error(e);
-    btn.disabled = false;
-    btn.textContent = '🔄 إعادة المحاولة';
   }
+
+  // ── دائماً اعرض شاشة النجاح ──
+  showSuccess(!fbOk);
 }
 
-function showSuccess(){
+function showSuccess(offlineOnly){
   const s = survey;
   document.getElementById('hero-section').style.display = 'none';
   document.getElementById('survey-form').style.display = 'none';
   document.getElementById('nav-btns').style.display = 'none';
   document.getElementById('sticky-progress').style.display = 'none';
   document.getElementById('success-screen').classList.add('show');
-  if (s.successMessage) document.getElementById('success-msg').textContent = s.successMessage;
+  const msgEl = document.getElementById('success-msg');
+  if(offlineOnly){
+    msgEl.textContent = 'تم تسجيل إجاباتك بنجاح وحفظها محلياً. ستُرفَع إلى قاعدة البيانات تلقائياً عند استعادة الاتصال.';
+  } else if (s && s.successMessage) {
+    msgEl.textContent = s.successMessage;
+  } else {
+    msgEl.textContent = 'تم تسجيل إجاباتك بنجاح. مساهمتك في هذه الدراسة العلمية ستساعد الباحثين.';
+  }
   launchConfetti();
 }
 
@@ -778,58 +812,74 @@ function launchConfetti(){
 }
 
 // ═══════════════════════════════════════
-//  INIT
+//  INIT — التهيئة الرئيسية
 // ═══════════════════════════════════════
 async function init(){
   initTheme();
-  document.getElementById('loading-screen').style.display = 'flex';
+  const loadEl = document.getElementById('loading-screen');
+  loadEl.style.display = 'flex';
 
-  // تحميل Firebase أولاً ليُحدِّث localStorage بأحدث survey
-  await initFirebase();
+  // ── 1. جلب survey من Firebase مع timeout 8 ثوانٍ ──
+  let fbLoaded = false;
+  try {
+    fbLoaded = await Promise.race([
+      initFirebase(),
+      new Promise(r => setTimeout(() => r(false), 8000))
+    ]);
+  } catch(e){ console.warn('Firebase error:', e); }
 
-  // الآن اقرأ survey (Firebase حدّث localStorage أعلاه)
+  // ── 2. اقرأ survey ──
   survey = loadSurvey();
+  loadEl.style.display = 'none';
 
-  document.getElementById('loading-screen').style.display = 'none';
-
+  // ── 3. إذا لم يوجد survey ──
   if (!survey) {
-    document.getElementById('closed-screen').style.display = 'flex';
-    document.getElementById('closed-screen').querySelector('h2').textContent = 'الاستبيان غير متاح';
-    document.getElementById('closed-screen').querySelector('p').textContent = 'لم يتم إعداد الاستبيان بعد. يرجى التواصل مع الباحث.';
+    const closedEl = document.getElementById('closed-screen');
+    closedEl.style.display = 'flex';
+    closedEl.querySelector('h2').textContent = fbLoaded ? 'الاستبيان غير متاح' : 'تعذّر الاتصال';
+    closedEl.querySelector('p').textContent = fbLoaded
+      ? 'لم يُعدّ الباحث الاستبيان بعد. يرجى التواصل معه.'
+      : 'تعذّر الاتصال بقاعدة البيانات. تأكد من اتصالك بالإنترنت ثم أعد المحاولة.';
+    const retryBtn = document.createElement('button');
+    retryBtn.className = 'btn btn-primary';
+    retryBtn.style.cssText = 'margin-top:1.5rem';
+    retryBtn.textContent = '🔄 إعادة المحاولة';
+    retryBtn.onclick = () => { closedEl.style.display='none'; init(); };
+    if(!closedEl.querySelector('.btn')) closedEl.appendChild(retryBtn);
     return;
   }
 
-  // Update site header
-  document.getElementById('site-title').childNodes[0].textContent = survey.title || 'استبيان';
-  if (survey.description) document.getElementById('site-sub').textContent = survey.description.substring(0,60);
-
+  // ── 4. تحقق من حالة الاستبيان ──
   if (!isSurveyOpen(survey)){
     document.getElementById('closed-screen').style.display = 'flex';
     return;
   }
 
-  // Count stats
+  // ── 5. أعدّ الواجهة ──
+  document.getElementById('site-title').childNodes[0].textContent = survey.title || 'استبيان';
+  if (survey.description) document.getElementById('site-sub').textContent = survey.description.substring(0,60);
+
   let totalDims = 0, totalQs = 0;
   (survey.axes||[]).forEach(ax => {
     (ax.dims||[]).forEach(dim => { totalDims++; totalQs += (dim.questions||[]).length; });
   });
 
-  // Populate hero
-  document.getElementById('hero-title').innerHTML =
-    survey.title ? survey.title.replace(/([:،—-])/, '<br><span>$1') + (survey.title.includes(':') || survey.title.includes('—') ? '' : '</span>') : 'استبيان بحثي';
+  document.getElementById('hero-title').textContent = survey.title || 'استبيان بحثي';
   document.getElementById('hero-desc').textContent = survey.description || '';
   document.getElementById('hs-axes').textContent = (survey.axes||[]).length;
   document.getElementById('hs-dims').textContent = totalDims;
   document.getElementById('hs-qs').textContent = totalQs;
-  const timeMin = Math.ceil(totalQs * 0.5);
+  const timeMin = Math.max(1, Math.ceil(totalQs * 0.5));
   document.getElementById('hs-time').textContent = `${timeMin}–${timeMin+5} دقيقة`;
-
   document.getElementById('hero-section').style.display = 'block';
 
-  // Start button
+  // ── 6. زر البدء ──
+  const oldBtn = document.getElementById('start-survey-btn');
+  if(oldBtn) oldBtn.remove();
   const startBtn = document.createElement('button');
+  startBtn.id = 'start-survey-btn';
   startBtn.className = 'btn btn-primary';
-  startBtn.style.cssText = 'margin-top:1.5rem;padding:14px 36px;font-size:15px;animation:pulse 2s infinite';
+  startBtn.style.cssText = 'margin-top:1.5rem;padding:14px 36px;font-size:15px';
   startBtn.textContent = '🚀 ابدأ الاستبيان';
   startBtn.onclick = () => {
     document.getElementById('hero-section').style.display = 'none';
