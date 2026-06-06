@@ -2616,28 +2616,36 @@ function renderCorrelation(){
   });
 
   if(!axes.length) html+='<div class="empty"><h3>لا توجد محاور معرَّفة</h3></div>';
-  html+=`<!-- END STEPWISE --></div>`;
+  html+=`</div>`;
 
-  const summarySection=buildRegrSummarySection(xAxes,yAxes,axes,comp);
-  html=html.replace('<!-- END STEPWISE -->',summarySection+'<!-- END STEPWISE -->');
   cont.innerHTML=html;
 
-  // Dims heatmap chart
+  // رسم مخطط الأبعاد
   if(allDims.length>=2){
     setTimeout(()=>{
-      const n2=allDims[0].vals.length;
-      const datasets=allDims.map((d,i)=>({
-        label:d.title,
-        data:allDims.map(d2=>parseFloat(pearson(d.vals,d2.vals).toFixed(3))),
-        borderColor:['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626'][i%6],
-        backgroundColor:['rgba(59,111,240,.3)','rgba(124,58,237,.3)','rgba(5,150,105,.3)','rgba(217,119,6,.3)','rgba(8,145,178,.3)','rgba(220,38,38,.3)'][i%6],
-        borderWidth:1.5,tension:.3
-      }));
       if(charts['c-corr-dims'])charts['c-corr-dims'].destroy();
       const ctx=document.getElementById('c-corr-dims')?.getContext('2d');
-      if(ctx){ charts['c-corr-dims']=new Chart(ctx,{
-        type:'bar',data:{labels:allDims.map(d=>d.title),datasets:datasets.slice(0,4)},
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:-1,max:1}},plugins:{legend:{labels:{font:{family:'Tajawal',size:10}}}}}}); }
+      if(!ctx) return;
+      const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+      const COLS=['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626'];
+      charts['c-corr-dims']=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:allDims.map(d=>d.title),
+          datasets:allDims.slice(0,5).map((d,i)=>({
+            label:d.title,
+            data:allDims.map(d2=>parseFloat(pearson(d.vals,d2.vals).toFixed(3))),
+            backgroundColor:COLS[i%COLS.length]+'88',
+            borderColor:COLS[i%COLS.length],
+            borderWidth:1.5
+          }))
+        },
+        options:{responsive:true,maintainAspectRatio:false,
+          scales:{y:{min:-1,max:1,title:{display:true,text:'r',font:{family:'Tajawal'}},
+            ticks:{color:isDark?'#94a3c0':'#6b7280'}},
+            x:{ticks:{color:isDark?'#94a3c0':'#6b7280',font:{family:'Tajawal',size:9}}}},
+          plugins:{legend:{labels:{font:{family:'Tajawal',size:10},color:isDark?'#94a3c0':'#6b7280'}}}}
+      });
     },100);
   }
 }
@@ -3364,7 +3372,7 @@ function renderRegression(){
   });
   html+=`</div>`;
 
-  cont.innerHTML=html;
+  cont.innerHTML += html;
 
   // Draw charts
   setTimeout(()=>{
@@ -4020,8 +4028,71 @@ function buildContextSummary(){
 }
 
 // ══════════════════════════════════════════════════════
-//  AI CHAT — Gemini · Groq · OpenRouter
+//  AI INTERPRETATION BUTTON — يظهر تحت كل جدول
 // ══════════════════════════════════════════════════════
+function aiInterpBtn(promptText, btnId){
+  return `<div style="margin-top:.75rem;display:flex;justify-content:flex-end">
+    <button id="${btnId}" class="btn btn-ghost" style="font-size:11px;border-radius:20px;gap:5px"
+      onclick="aiInterpretSection('${btnId}','${encodeURIComponent(promptText)}')">
+      🤖 تفسير بالذكاء الاصطناعي
+    </button>
+  </div>
+  <div id="${btnId}-result" style="display:none;margin-top:.75rem;padding:1rem 1.25rem;
+    background:linear-gradient(135deg,rgba(59,111,240,.04),rgba(124,58,237,.02));
+    border:1px solid rgba(59,111,240,.18);border-right:4px solid var(--accent);
+    border-radius:var(--r2);font-size:13px;color:var(--text2);line-height:2;text-align:justify">
+  </div>`;
+}
+
+window.aiInterpretSection = async (btnId, encodedPrompt) => {
+  const provider = localStorage.getItem('ai_provider') || 'gemini';
+  const key = localStorage.getItem('ai_key_'+provider);
+  if(!key){
+    toast('أضف مفتاح AI في صفحة "مساعد AI" أولاً','err');
+    showPage('aichat');
+    return;
+  }
+  const resultEl = document.getElementById(btnId+'-result');
+  const btn = document.getElementById(btnId);
+  if(!resultEl||!btn) return;
+
+  // إذا كان مفتوحاً → أغلقه
+  if(resultEl.style.display === 'block'){
+    resultEl.style.display = 'none';
+    btn.textContent = '🤖 تفسير بالذكاء الاصطناعي';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span style="width:12px;height:12px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span> جارٍ التفسير...';
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = '<span style="color:var(--text3);font-size:12px">⏳ يفكّر الذكاء الاصطناعي...</span>';
+
+  const prompt = decodeURIComponent(encodedPrompt);
+  const contextSummary = buildContextSummary();
+  const systemPrompt = `أنت مساعد بحثي أكاديمي متخصص في الإحصاء وتحليل الاستبيانات. أجب باللغة العربية بأسلوب أكاديمي مناسب لرسائل الماستر. كن مختصراً ودقيقاً (4-6 أسطر). بيانات الدراسة:\n${contextSummary}`;
+
+  try {
+    const PROV = {
+      gemini: async(k,s,m)=>{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:s+'\n\n'+m}]}],generationConfig:{maxOutputTokens:600}})});const d=await r.json();if(d.error)throw new Error(d.error.message);return d.candidates?.[0]?.content?.parts?.[0]?.text||'';},
+      groq: async(k,s,m)=>{const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:600,messages:[{role:'system',content:s},{role:'user',content:m}]})});const d=await r.json();if(d.error)throw new Error(d.error.message);return d.choices?.[0]?.message?.content||'';},
+      openrouter: async(k,s,m)=>{const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k,'HTTP-Referer':'https://anouar-dah.github.io'},body:JSON.stringify({model:'google/gemini-2.0-flash-exp:free',max_tokens:600,messages:[{role:'system',content:s},{role:'user',content:m}]})});const d=await r.json();if(d.error)throw new Error(JSON.stringify(d.error));return d.choices?.[0]?.message?.content||'';}
+    };
+    const reply = await PROV[provider](key, systemPrompt, prompt);
+    resultEl.innerHTML = reply.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') +
+      `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+        <button style="font-size:10px;padding:2px 10px;border-radius:20px;border:none;background:rgba(59,111,240,.1);color:var(--accent);cursor:pointer;font-family:'Tajawal',sans-serif"
+          onclick="navigator.clipboard.writeText(document.getElementById('${btnId}-result').innerText.replace('نسخ','').trim()).then(()=>toast('✅ تم النسخ','ok'))">📋 نسخ</button>
+      </div>`;
+    btn.disabled = false;
+    btn.innerHTML = '🤖 ✓ إخفاء التفسير';
+  } catch(e){
+    resultEl.innerHTML = `<span style="color:var(--red)">❌ خطأ: ${e.message}</span>`;
+    btn.disabled = false;
+    btn.innerHTML = '🤖 تفسير بالذكاء الاصطناعي';
+    toast('خطأ في AI: '+e.message,'err');
+  }
+};
 let AI_PROVIDER = localStorage.getItem('ai_provider') || 'gemini';
 
 const AI_PROVIDERS = {
