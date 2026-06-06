@@ -337,8 +337,28 @@ tbody td { border-bottom: 1px solid var(--border) !important; }
   </div>
 </header>
 
+<!-- Firebase Rules Warning Banner -->
+<div id="fb-rules-banner" style="display:none;position:fixed;top:58px;left:0;right:0;z-index:190;
+  background:linear-gradient(135deg,#7f1d1d,#991b1b);color:#fecaca;
+  padding:10px 2rem;font-size:12.5px;align-items:center;gap:12px;flex-wrap:wrap;
+  border-bottom:2px solid rgba(220,38,38,.5)">
+  <span style="font-size:18px">⚠️</span>
+  <div style="flex:1;min-width:200px">
+    <strong>Firebase Rules مرفوضة — البيانات لن تُزامَن بين الأجهزة!</strong><br>
+    <span style="font-size:11px;opacity:.85">اذهب إلى Firebase Console → Realtime Database → Rules وضع:
+    <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:3px;font-family:monospace">{ "rules": { ".read": true, ".write": true } }</code>
+    ثم Publish</span>
+  </div>
+  <a href="https://console.firebase.google.com/project/survey-ai-project-3f4b8/database/survey-ai-project-3f4b8-default-rtdb/rules"
+    target="_blank"
+    style="padding:6px 14px;background:rgba(255,255,255,.15);border-radius:6px;color:#fff;text-decoration:none;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid rgba(255,255,255,.2)">
+    🔗 فتح Firebase Rules
+  </a>
+  <button onclick="hideFbWarning()" style="background:rgba(255,255,255,.1);border:none;color:#fecaca;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:11px">✕ إغلاق</button>
+</div>
+
 <!-- LAYOUT -->
-<div class="layout">
+<div class="layout" id="main-layout">
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
@@ -627,7 +647,20 @@ tbody td { border-bottom: 1px solid var(--border) !important; }
       <button class="btn btn-ghost" onclick="testFirebase()">🔌 اختبار الاتصال</button>
       <button class="btn btn-ghost" onclick="autoFillFirebase()">✨ ملء تلقائي (مشروعك)</button>
     </div>
-    <div id="fb-status-msg" style="margin-top:8px;font-size:12px;color:var(--text3)"></div>
+    <div id="fb-status-msg" style="margin-top:8px;font-size:12px"></div>
+    <!-- Rules Warning -->
+    <div style="margin-top:1rem;padding:.875rem 1rem;background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.2);border-radius:var(--r2)">
+      <div style="font-size:12px;font-weight:800;color:var(--red);margin-bottom:6px">⚠️ خطوة ضرورية: إعداد قواعد الأمان (Rules)</div>
+      <div style="font-size:11.5px;color:var(--text2);line-height:1.9">
+        ١. اذهب إلى <a href="https://console.firebase.google.com/project/survey-ai-project-3f4b8/database" target="_blank" style="color:var(--accent);font-weight:700">Firebase Console → Realtime Database → Rules</a><br>
+        ٢. استبدل القواعد الموجودة بهذا الكود:
+      </div>
+      <div style="margin-top:8px;padding:8px 12px;background:var(--bg3);border-radius:var(--r3);font-family:monospace;font-size:12px;direction:ltr;text-align:left;border:1px solid var(--border2)">
+        {<br>&nbsp;&nbsp;"rules": {<br>&nbsp;&nbsp;&nbsp;&nbsp;".read": true,<br>&nbsp;&nbsp;&nbsp;&nbsp;".write": true<br>&nbsp;&nbsp;}<br>}
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3)">٣. اضغط Publish لحفظ القواعد</div>
+      <button class="btn btn-primary" onclick="window.open('https://console.firebase.google.com/project/survey-ai-project-3f4b8/database/survey-ai-project-3f4b8-default-rtdb/rules','_blank')" style="margin-top:8px;font-size:11px">🔗 فتح Firebase Rules</button>
+    </div>
   </div>
   <div class="card">
     <div class="card-title" style="margin-bottom:1rem">🔑 كلمة مرور الباحث</div>
@@ -978,22 +1011,34 @@ window.stab = (id, el, group) => {
 };
 
 // ══════════════════════════════════════════════════════
-//  FIREBASE
+//  FIREBASE CONFIG — مضمّن مباشرة
+// ══════════════════════════════════════════════════════
+const FIREBASE_CFG = {
+  apiKey: "AIzaSyB5ivtHu4iNCz-F9HQXoSCT4j2UaG9_ICw",
+  authDomain: "survey-ai-project-3f4b8.firebaseapp.com",
+  databaseURL: "https://survey-ai-project-3f4b8-default-rtdb.firebaseio.com",
+  projectId: "survey-ai-project-3f4b8",
+  storageBucket: "survey-ai-project-3f4b8.firebasestorage.app",
+  messagingSenderId: "719850463901",
+  appId: "1:719850463901:web:465e26dd9974c70f082a74",
+  measurementId: "G-2HS5E941FP"
+};
+// احفظ دائماً في localStorage للتوافق مع الكود القديم
+localStorage.setItem('firebase_config', JSON.stringify(FIREBASE_CFG));
+
+// ══════════════════════════════════════════════════════
+//  FIREBASE INIT
 // ══════════════════════════════════════════════════════
 async function initFirebase(){
-  const cfg = localStorage.getItem('firebase_config');
-  if (!cfg) { console.log('No Firebase config found'); return; }
   try {
     const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const { getDatabase, ref, push, set, get, onValue, remove } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-    let parsedCfg;
-    try { parsedCfg = JSON.parse(cfg); } catch(e){ toast('Firebase config غير صالح','err'); return; }
     const existing = getApps().find(a => a.name === 'admin-app');
-    const app = existing || initializeApp(parsedCfg, 'admin-app');
+    const app = existing || initializeApp(FIREBASE_CFG, 'admin-app');
     const database = getDatabase(app);
     db = { ref, push, set, get, onValue, remove, db: database };
 
-    // ── دائماً اقرأ survey من Firebase أولاً (يغلب localStorage) ──
+    // ── اقرأ survey من Firebase أولاً ──
     try {
       const surveySnap = await get(ref(database, 'survey'));
       if (surveySnap.exists() && surveySnap.val()?.title) {
@@ -1002,12 +1047,16 @@ async function initFirebase(){
         updateHeaderTitle();
         toast('✅ تم تحميل الاستبيان من Firebase','ok');
       } else if (survey) {
-        // لا يوجد في Firebase — ارفعه
         await set(ref(database, 'survey'), survey);
       }
-    } catch(e){ console.warn('Survey sync error:', e); }
+    } catch(e){
+      console.warn('Survey sync error:', e.message);
+      if(e.message && e.message.includes('PERMISSION_DENIED')){
+        toast('⚠️ Firebase: افتح Rules وضع ".read/.write": true','err');
+      }
+    }
 
-    // ── استمع لتغييرات الاستجابات في الوقت الفعلي ──
+    // ── استمع للاستجابات في الوقت الفعلي ──
     onValue(ref(database, 'submissions'), snap => {
       if (snap.exists()) {
         const val = snap.val();
@@ -1034,27 +1083,77 @@ async function initFirebase(){
     document.getElementById('db-dot').classList.add('on');
     document.getElementById('db-label').textContent = 'متصل ✓';
     console.log('Firebase connected successfully');
+
+    // ── اختبار الكتابة والقراءة تلقائياً ──
+    try {
+      await set(ref(database, '_ping'), { t: Date.now() });
+      document.getElementById('db-label').textContent = 'متصل ✓ قراءة/كتابة';
+      hideFbWarning();
+    } catch(rulesErr) {
+      document.getElementById('db-dot').classList.remove('on');
+      document.getElementById('db-label').textContent = 'Rules مرفوضة ⚠️';
+      showFbWarning();
+    }
   } catch(e) {
     console.error('Firebase init error:', e);
-    document.getElementById('db-label').textContent = 'غير متصل';
-    toast('تعذّر الاتصال بـ Firebase: '+e.message,'err');
+    document.getElementById('db-dot').classList.remove('on');
+    document.getElementById('db-label').textContent = 'غير متصل ❌';
+    showFbWarning();
   }
 }
 
+function showFbWarning(){
+  const banner = document.getElementById('fb-rules-banner');
+  if(banner) banner.style.display = 'flex';
+}
+function hideFbWarning(){
+  const banner = document.getElementById('fb-rules-banner');
+  if(banner) banner.style.display = 'none';
+}
+
 window.saveFirebase = async () => {
-  const cfg = document.getElementById('fb-config').value.trim();
-  if (!cfg) { toast('أدخل إعدادات Firebase','err'); return; }
-  try { JSON.parse(cfg); } catch(e) { toast('تنسيق JSON غير صحيح','err'); return; }
+  const raw = document.getElementById('fb-config').value.trim();
+  if (!raw) { toast('أدخل إعدادات Firebase','err'); return; }
+
+  // قبول كائن JS أو JSON
+  let cfg = raw;
+  if (raw.startsWith('{') && !raw.includes('"apiKey"')) {
+    cfg = raw.replace(/(\w+)\s*:/g,'"$1":').replace(/'/g,'"');
+  }
+  try { JSON.parse(cfg); } catch(e) { toast('تنسيق غير صحيح — تأكد من نسخ JSON كامل','err'); return; }
+
   localStorage.setItem('firebase_config', cfg);
-  toast('جارٍ الاتصال...','ok');
+  const statusEl = document.getElementById('fb-status-msg');
+  if(statusEl) statusEl.innerHTML = '⏳ جارٍ الاتصال بـ Firebase...';
+
+  // إعادة بناء db من الصفر
+  db = null;
   await initFirebase();
 };
+
 window.testFirebase = async () => {
-  if (!db) { toast('Firebase غير متصل','err'); return; }
+  const statusEl = document.getElementById('fb-status-msg');
+  if (!db) {
+    if(statusEl) statusEl.innerHTML = '<span style="color:var(--red)">❌ Firebase غير متصل — اضغط "حفظ وتطبيق" أولاً</span>';
+    toast('Firebase غير متصل','err'); return;
+  }
   try {
-    await db.set(db.ref(db.db, 'ping'), Date.now());
-    toast('✅ الاتصال يعمل','ok');
-  } catch(e) { toast('فشل الاتصال','err'); }
+    await db.set(db.ref(db.db, '_ping'), { t: Date.now(), msg: 'test' });
+    if(statusEl) statusEl.innerHTML = '<span style="color:var(--green)">✅ الاتصال يعمل بنجاح!</span>';
+    toast('✅ Firebase متصل وتعمل الكتابة/القراءة','ok');
+  } catch(e) {
+    const errMsg = e.message||'';
+    let hint = '';
+    if(errMsg.includes('PERMISSION_DENIED')){
+      hint = `<div style="margin-top:8px;padding:8px 12px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:var(--r3);font-size:11px">
+        🔒 <strong>المشكلة: Rules مرفوضة</strong><br>
+        اذهب إلى Firebase Console → Realtime Database → Rules وضع:<br>
+        <code style="font-family:monospace;background:var(--bg4);padding:2px 6px;border-radius:3px">{ "rules": { ".read": true, ".write": true } }</code>
+      </div>`;
+    }
+    if(statusEl) statusEl.innerHTML = `<span style="color:var(--red)">❌ خطأ: ${errMsg}</span>${hint}`;
+    toast('فشل الاتصال: '+errMsg,'err');
+  }
 };
 
 // ══════════════════════════════════════════════════════
@@ -2891,25 +2990,34 @@ function multipleOLS(Xmat, yv){
 }
 
 function renderRegression(){
-  const comp=getCompleted(),n=comp.length,axes=survey?.axes||[];
+  const comp=getCompleted(),n=comp.length;
+  let axes=survey?.axes||[];
   const cont=document.getElementById('regression-container');
-  const xAxes=axes.filter(ax=>ax.variable==='X');
-  const yAxes=axes.filter(ax=>ax.variable==='Y');
   if(n<3){
     cont.innerHTML='<div class="empty"><h3>يلزم 3 مستجيبين على الأقل لتشغيل تحليل الانحدار</h3></div>';return;
   }
-  if(!xAxes.length||!yAxes.length){
+  if(axes.length<2){
     cont.innerHTML=`<div style="background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.3);border-radius:var(--radius);padding:2rem;text-align:center">
       <div style="font-size:32px;margin-bottom:1rem">⚙️</div>
-      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:.75rem">يلزم تحديد المتغيرات</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.25rem">
-        لتشغيل تحليل الانحدار، يجب تحديد:<br>
-        <strong style="color:var(--accent)">متغير مستقل (X)</strong> و<strong style="color:var(--red)">متغير تابع (Y)</strong><br>
-        في صفحة <strong>"بناء الاستبيان"</strong> لكل محور
-      </div>
-      <button class="btn btn-primary" onclick="showPage('builder')">🔧 اذهب إلى بناء الاستبيان</button>
+      <div style="font-size:15px;font-weight:700;margin-bottom:.75rem">يلزم محورَان على الأقل</div>
+      <div style="font-size:13px;color:var(--text2)">أضف محورَين أو أكثر في بناء الاستبيان، أو حدّد X وY لكل محور.</div>
+      <button class="btn btn-primary" style="margin-top:1rem" onclick="showPage('builder')">🔧 بناء الاستبيان</button>
+    </div>`;return;
+  }
+
+  // تعيين تلقائي لـ X/Y إذا لم يُحدَّد
+  let xAxes=axes.filter(ax=>ax.variable==='X');
+  let yAxes=axes.filter(ax=>ax.variable==='Y');
+  if(!xAxes.length||!yAxes.length){
+    // آخر محور = Y ، الباقي = X
+    xAxes = axes.slice(0, axes.length-1);
+    yAxes = [axes[axes.length-1]];
+    cont.innerHTML = `<div style="background:rgba(217,119,6,.07);border:1.5px dashed rgba(217,119,6,.4);border-radius:var(--r2);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2)">
+      ℹ️ لم تُحدَّد X وY — تم تعيين <strong>"${xAxes.map(a=>a.title).join('، ')}"</strong> كـ X و<strong>"${yAxes[0].title}"</strong> كـ Y تلقائياً.
+      حدّد المتغيرات يدوياً في <a href="#" onclick="showPage('builder');return false" style="color:var(--accent)">بناء الاستبيان</a>.
     </div>`;
-    return;
+  } else {
+    cont.innerHTML = '';
   }
 
   const COLORS=['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626'];
