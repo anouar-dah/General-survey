@@ -2451,28 +2451,27 @@ function renderCorrelation(){
     <button class="btn btn-primary" style="margin-top:1rem" onclick="showPage('builder')">🔧 بناء الاستبيان</button>
   </div>`;return;}
   const pR=(r,n2)=>{const t=r*Math.sqrt((n2-2)/(1-r*r+1e-10));return pFromT(t,n2-2);};
+  const sL=p=>p<.001?'***':p<.01?'**':p<.05?'*':'ns';
 
   // ─── Tabs HTML
   let html=`<div class="tabs" style="margin-bottom:1.25rem">
     <button class="tab active" onclick="corrTab('axes',this)">المحاور</button>
     <button class="tab" onclick="corrTab('dims',this)">الأبعاد</button>
-    <button class="tab" onclick="corrTab('qs',this)">الأسئلة (X↔Y)</button>
-  </div>
+    <button class="tab" onclick="corrTab('qs',this)">الأسئلة</button>
+  </div>`;
 
-  <!-- TAB: Axes -->
-  <div id="corr-axes" class="tc active">
-    <div class="spss-section"><div class="spss-head"><div class="spss-head-title">🔗 مصفوفة ارتباط المحاور — Pearson Correlation Matrix</div></div>
-    <div class="spss-body">`;
+  // ════ TAB 1: المحاور ════
   const axLabels=axes.map((ax,i)=>ax.title||'م'+(i+1));
   const axVals=axes.map((_,ai)=>getAxVals(ai,comp));
+  html+=`<div id="corr-axes" class="tc active">`;
+  html+=`<div class="spss-section"><div class="spss-head"><div class="spss-head-title">🔗 مصفوفة ارتباط بيرسون — بين المحاور</div></div><div class="spss-body">`;
   html+=_buildPearsonMatrix(axLabels,axVals,n);
-
   // X→Y card
   const xAxes=axes.filter(ax=>ax.variable==='X');
   const yAxes=axes.filter(ax=>ax.variable==='Y');
   if(xAxes.length&&yAxes.length){
     html+=`<div style="margin-top:1.25rem;padding:1rem;background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.04));border-radius:var(--r2);border:1px solid rgba(59,111,240,.15)">
-      <div style="font-size:12px;font-weight:700;margin-bottom:.75rem">🎯 معاملات الارتباط: المتغير المستقل (X) ← → المتغير التابع (Y)</div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:.75rem">🎯 معاملات الارتباط: المستقل (X) ↔ التابع (Y)</div>
       <div class="tbl-wrap"><table><thead><tr><th>X المستقل</th><th>Y التابع</th><th>r</th><th>r²</th><th>Sig</th><th>الشدة</th><th>القرار</th></tr></thead><tbody>`;
     xAxes.forEach(xAx=>{
       const xi=axes.indexOf(xAx);
@@ -2488,134 +2487,78 @@ function renderCorrelation(){
     });
     html+=`</tbody></table></div></div>`;
   }
-  html+=`</div></div></div>
+  html+=`</div></div></div>`;
 
-  <!-- TAB: Dims -->
-  <div id="corr-dims" class="tc">
-    <div class="spss-section"><div class="spss-head"><div class="spss-head-title">🔗 مصفوفة ارتباط الأبعاد</div></div><div class="spss-body">`;
-  const allDims=[];axes.forEach((ax,ai)=>(ax.dims||[]).forEach((dim,di)=>allDims.push({title:dim.title.substring(0,18),vals:getDimVals(ai,di,comp)})));
+  // ════ TAB 2: الأبعاد ════
+  html+=`<div id="corr-dims" class="tc">`;
+  const allDims=[];
+  axes.forEach((ax,ai)=>(ax.dims||[]).forEach((dim,di)=>allDims.push({title:(dim.title||`بعد ${di+1}`).substring(0,22),vals:getDimVals(ai,di,comp),axTitle:ax.title})));
   if(allDims.length>=2){
+    html+=`<div class="spss-section"><div class="spss-head"><div class="spss-head-title">🔗 مصفوفة ارتباط بيرسون — بين الأبعاد</div></div><div class="spss-body">`;
     html+=_buildPearsonMatrix(allDims.map(d=>d.title),allDims.map(d=>d.vals),n);
-    // Chart
     html+=`<div style="margin-top:1rem;height:260px"><canvas id="c-corr-dims"></canvas></div>`;
-  }else{html+='<div class="empty"><h3>يلزم بُعدَين على الأقل</h3></div>';}
-  html+=`</div></div></div>
-
-  <!-- TAB: Qs = CITC + inter-item matrix per dimension -->
-  <div id="corr-qs" class="tc">`;
-
-  // ── بناء رمز المتغير: X1,X2... Y1,Y2... ──
-  const axSymbols={};
-  let xi_=0,yi_=0;
-  axes.forEach((ax,ai)=>{
-    if(ax.variable==='X'){xi_++;axSymbols[ai]='X'+xi_;}
-    else if(ax.variable==='Y'){yi_++;axSymbols[ai]='Y'+yi_;}
-    else axSymbols[ai]='M'+(ai+1);
-  });
-
-  // ── لكل محور: اتساق داخلي + مصفوفة ارتباط فقرات البعد ──
-  axes.forEach((ax,ai)=>{
-    const sym=axSymbols[ai];
-    html+=`<div class="spss-section" style="margin-bottom:1.25rem">
-      <div class="spss-head">
-        <div class="spss-head-title">🔗 الاتساق الداخلي وارتباط الفقرات — المحور: ${ax.title} (${sym})</div>
-        <span class="badge ${ax.variable==='X'?'b-blue':ax.variable==='Y'?'b-red':'b-amber'}">${sym}</span>
-      </div><div class="spss-body">`;
-
-    // ── لكل بعد: CITC + مصفوفة ارتباط ──
-    (ax.dims||[]).forEach((dim,di)=>{
-      const qs=dim.questions||[];
-      if(!qs.length) return;
-
-      // اسم الفقرات: X1_1, X1_2 أو Y1_1 ...
-      const qSymbols=qs.map((_,qi)=>`${sym}_${qi+1}`);
-      const qValsArr=qs.map((_,qi)=>getQVals(ai,di,qi,comp));
-
-      // ── جدول CITC ──
-      const totV=comp.map(r=>{let s=0,c2=0;qs.forEach((_,qi)=>{const v=r.answers?.[`${ai}_${di}_${qi}`];if(v){s+=v;c2++;}});return c2?s/c2:0;});
-
-      html+=`<div style="font-size:12px;font-weight:700;color:var(--accent);margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3);border-right:3px solid var(--accent)">
-        البعد: ${dim.title}</div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">
-        أولاً — صدق الاتساق الداخلي (CITC)</div>
-      <div class="tbl-wrap"><table>
-        <thead><tr>
-          <th>الرمز</th><th>نص الفقرة</th>
-          <th>الارتباط بالبعد (r)</th><th>CITC المصحح</th>
-          <th>Alpha إذا حُذف</th><th>Sig</th><th>الحكم</th>
-        </tr></thead><tbody>`;
-
-      qs.forEach((q,qi)=>{
-        const qv=qValsArr[qi];
-        if(!qv.length){html+=`<tr><td>${qSymbols[qi]}</td><td style="text-align:right">${q.text}</td><td colspan="5" style="color:var(--text3)">—</td></tr>`;return;}
-        const rt=pearson(qv,totV);
-        const corrV=comp.map(r=>{let s=0,c2=0;qs.forEach((_,qi2)=>{if(qi2===qi)return;const v=r.answers?.[`${ai}_${di}_${qi2}`];if(v){s+=v;c2++;}});return c2?s/c2:0;});
-        const rc=pearson(qv,corrV);
-        // alpha if deleted
-        const remainVals=qs.map((_,qi2)=>qi2!==qi?qValsArr[qi2]:[]).filter(a=>a.length);
-        const alpDel=remainVals.length>=2?cronbach(remainVals):null;
-        const p=pR(rc,n);
-        html+=`<tr>
-          <td style="font-weight:700;color:var(--accent)">${qSymbols[qi]}</td>
-          <td style="text-align:right;font-size:11.5px">${q.text}</td>
-          <td>${rt.toFixed(3)}</td>
-          <td style="font-weight:700;color:${rc>=.4?'var(--green)':rc>=.3?'var(--accent)':'var(--red)'}">${rc.toFixed(3)}</td>
-          <td>${alpDel!==null?alpDel.toFixed(3):'—'}</td>
-          <td>${pSig(p)}</td>
-          <td><span class="badge ${rc>=.3?'b-green':'b-red'}">${rc>=.4?'ممتاز ✓':rc>=.3?'مقبول ✓':'ضعيف ✗'}</span></td>
-        </tr>`;
-      });
-      html+=`</tbody></table></div>`;
-
-      // ── مصفوفة الارتباط بين الفقرات ──
-      if(qs.length>=2){
-        html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">ثانياً — مصفوفة الارتباط بين الفقرات (Inter-Item Correlation Matrix)</div>
-        <div class="tbl-wrap"><table>
-          <thead><tr><th></th>${qSymbols.map(s=>`<th style="color:var(--accent)">${s}</th>`).join('')}</tr></thead>
-          <tbody>`;
-        qs.forEach((_,i)=>{
-          html+=`<tr><td style="font-weight:700;color:var(--accent)">${qSymbols[i]}</td>`;
-          qs.forEach((_,j)=>{
-            if(i===j){html+=`<td style="background:var(--bg4);font-weight:700">1.000</td>`;}
-            else{
-              const r=pearson(qValsArr[i],qValsArr[j]);
-              const p2=pR(r,n);
-              const col=Math.abs(r)>=.6?'var(--green)':Math.abs(r)>=.3?'var(--accent)':'var(--text3)';
-              html+=`<td style="color:${col}">${r.toFixed(3)}<br><small>${sL(p2)}</small></td>`;
-            }
-          });
-          html+=`</tr>`;
-        });
-        html+=`</tbody></table></div>
-        <div style="font-size:10px;color:var(--text3);margin-top:5px">*** p&lt;0.001 | ** p&lt;0.01 | * p&lt;0.05 | ns: غير دال</div>`;
-
-        // ── تفسير CITC ──
-        const citcVals=qs.map((_,qi)=>{
-          const corrV=comp.map(r=>{let s=0,c2=0;qs.forEach((_,qi2)=>{if(qi2===qi)return;const v=r.answers?.[`${ai}_${di}_${qi2}`];if(v){s+=v;c2++;}});return c2?s/c2:0;});
-          return pearson(qValsArr[qi],corrV);
-        });
-        const allPass=citcVals.every(r=>r>=.3);
-        const weakItems=qs.filter((_,qi)=>citcVals[qi]<.3).map((_,qi)=>qSymbols[qi]).join('، ');
-        html+=`<div style="margin-top:.75rem;padding:.75rem 1rem;background:${allPass?'rgba(5,150,105,.05)':'rgba(220,38,38,.05)'};border:1px solid ${allPass?'rgba(5,150,105,.2)':'rgba(220,38,38,.2)'};border-radius:var(--r2);font-size:12px;color:var(--text2);line-height:1.9">
-          <strong>التفسير:</strong> ${allPass
-            ?`جميع فقرات البُعد "${dim.title}" تجاوزت معيار CITC ≥ 0.30، مما يدل على <strong>اتساق داخلي جيد</strong> للبعد وصلاحية جميع الفقرات للقياس.`
-            :`الفقرات (${weakItems}) لم تتجاوز معيار CITC ≥ 0.30، ويُنصح بمراجعتها أو حذفها لتحسين ثبات البُعد.`}
-        </div>`;
-      }
-      html+=`<hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">`;
-    });
-
-    // ── تفسير عام للمحور ──
-    html+=`<div style="padding:.875rem 1.25rem;background:linear-gradient(135deg,rgba(59,111,240,.04),rgba(124,58,237,.02));border-radius:var(--r2);border:1px solid rgba(59,111,240,.1);font-size:12.5px;color:var(--text2);line-height:2">
-      <strong>📌 تفسير عام للمحور (${sym}) — ${ax.title}:</strong><br>
-      تشير نتائج الاتساق الداخلي إلى أن فقرات المحور <strong>${ax.title}</strong> (${sym}) تتمتع بمستوى
-      ${(()=>{const vals2D=(ax.dims||[]).flatMap((d,di)=>(d.questions||[]).map((_,qi)=>getQVals(ai,di,qi,comp))).filter(v=>v.length>=2);const a=vals2D.length>=2?cronbach(vals2D):null;return a!==null?`<strong>جيد من الثبات (α = ${a.toFixed(3)})</strong>، مما يؤكد صلاحية هذا المحور للقياس.`:'من الاتساق الداخلي.'})()}
-    </div>`;
-
     html+=`</div></div>`;
-  });
+    // Per-axis dims matrix
+    axes.forEach((ax,ai)=>{
+      const axisDims=(ax.dims||[]).map((dim,di)=>({title:(dim.title||`بعد ${di+1}`).substring(0,22),vals:getDimVals(ai,di,comp)})).filter(d=>d.vals.length>=2);
+      if(axisDims.length<2) return;
+      html+=`<div class="spss-section" style="margin-top:1rem"><div class="spss-head"><div class="spss-head-title">🔗 ارتباط أبعاد المحور: ${ax.title}</div></div><div class="spss-body">`;
+      html+=_buildPearsonMatrix(axisDims.map(d=>d.title),axisDims.map(d=>d.vals),n);
+      html+=`</div></div>`;
+    });
+  }else{html+=`<div class="empty"><h3>يلزم بُعدَين على الأقل</h3></div>`;}
+  html+=`</div>`;
 
-  if(!axes.length) html+='<div class="empty"><h3>لا توجد محاور معرَّفة</h3></div>';
+  // ════ TAB 3: الأسئلة — مصفوفة ارتباط بيرسون بين جميع الأسئلة ════
+  html+=`<div id="corr-qs" class="tc">`;
+
+  // ════ مصفوفة بيرسون بين جميع الأسئلة — كل الأسئلة معاً ════
+  // جمع كل الأسئلة من كل المحاور والأبعاد في قائمة واحدة
+  {
+    const axSymbols2={};let xi2_=0,yi2_=0;
+    axes.forEach((ax,ai)=>{if(ax.variable==='X'){xi2_++;axSymbols2[ai]='X'+xi2_;}else if(ax.variable==='Y'){yi2_++;axSymbols2[ai]='Y'+yi2_;}else axSymbols2[ai]='M'+(ai+1);});
+    const allQItems=[];
+    axes.forEach((ax,ai)=>{
+      const sym=axSymbols2[ai];
+      (ax.dims||[]).forEach((dim,di)=>{
+        (dim.questions||[]).forEach((q,qi)=>{
+          const vals=getQVals(ai,di,qi,comp);
+          if(vals.length>=2) allQItems.push({label:`${sym}D${di+1}Q${qi+1}`,shortText:(q.text||'').substring(0,28),vals,axTitle:ax.title,dimTitle:dim.title});
+        });
+      });
+    });
+    if(allQItems.length>=2){
+      // جدول أسماء الأسئلة
+      html+=`<div class="spss-section"><div class="spss-head"><div class="spss-head-title">🔗 مصفوفة ارتباط بيرسون — بين جميع الأسئلة</div></div><div class="spss-body">`;
+      html+=`<div style="margin-bottom:1rem"><div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:.5rem">دليل الرموز</div>
+      <div class="tbl-wrap"><table><thead><tr><th>الرمز</th><th>المحور</th><th>البعد</th><th>نص السؤال</th></tr></thead><tbody>`;
+      allQItems.forEach(it=>{ html+=`<tr><td style="font-weight:700;color:var(--accent)">${it.label}</td><td style="font-size:11px">${it.axTitle}</td><td style="font-size:11px">${it.dimTitle}</td><td style="text-align:right;font-size:11.5px">${it.shortText}</td></tr>`; });
+      html+=`</tbody></table></div></div>`;
+      html+=_buildPearsonMatrix(allQItems.map(it=>it.label),allQItems.map(it=>it.vals),n);
+      html+=`</div></div>`;
+
+      // مصفوفة منفصلة لكل محور (أسئلة المحور مع بعضها)
+      axes.forEach((ax,ai)=>{
+        const sym=axSymbols2[ai];
+        const axQItems=[];
+        (ax.dims||[]).forEach((dim,di)=>{
+          (dim.questions||[]).forEach((q,qi)=>{
+            const vals=getQVals(ai,di,qi,comp);
+            if(vals.length>=2) axQItems.push({label:`${sym}D${di+1}Q${qi+1}`,shortText:(q.text||'').substring(0,22),vals,dimTitle:dim.title});
+          });
+        });
+        if(axQItems.length<2) return;
+        html+=`<div class="spss-section" style="margin-top:1rem"><div class="spss-head">
+          <div class="spss-head-title">🔗 ارتباط أسئلة المحور: ${ax.title}</div>
+          <span class="badge ${ax.variable==='X'?'b-blue':ax.variable==='Y'?'b-red':'b-amber'}">${sym}</span>
+        </div><div class="spss-body">`;
+        html+=_buildPearsonMatrix(axQItems.map(it=>it.label),axQItems.map(it=>it.vals),n);
+        html+=`</div></div>`;
+      });
+    } else {
+      html+=`<div class="empty"><h3>يلزم سؤالَين على الأقل لعرض مصفوفة الارتباط</h3></div>`;
+    }
+  }
   html+=`</div>`;
 
   cont.innerHTML=html;
@@ -3008,7 +2951,7 @@ function renderRegression(){
     cont.innerHTML=`<div style="background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.3);border-radius:var(--radius);padding:2rem;text-align:center">
       <div style="font-size:32px;margin-bottom:1rem">⚙️</div>
       <div style="font-size:15px;font-weight:700;margin-bottom:.75rem">يلزم محورَان على الأقل</div>
-      <div style="font-size:13px;color:var(--text2)">أضف محورَين أو أكثر في بناء الاستبيان، أو حدّد X وY لكل محور.</div>
+      <div style="font-size:13px;color:var(--text2)">أضف محورَين أو أكثر وحدّد X وY لكل محور.</div>
       <button class="btn btn-primary" style="margin-top:1rem" onclick="showPage('builder')">🔧 بناء الاستبيان</button>
     </div>`;return;
   }
@@ -3017,7 +2960,6 @@ function renderRegression(){
   let xAxes=axes.filter(ax=>ax.variable==='X');
   let yAxes=axes.filter(ax=>ax.variable==='Y');
   if(!xAxes.length||!yAxes.length){
-    // آخر محور = Y ، الباقي = X
     xAxes = axes.slice(0, axes.length-1);
     yAxes = [axes[axes.length-1]];
     cont.innerHTML = `<div style="background:rgba(217,119,6,.07);border:1.5px dashed rgba(217,119,6,.4);border-radius:var(--r2);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2)">
@@ -3028,355 +2970,379 @@ function renderRegression(){
     cont.innerHTML = '';
   }
 
-  const COLORS=['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626'];
   let html=`<div class="tabs">
     <button class="tab active" onclick="regTab('simple',this)">انحدار بسيط</button>
     <button class="tab" onclick="regTab('multiple',this)">انحدار متعدد</button>
     <button class="tab" onclick="regTab('stepwise',this)">تدريجي Stepwise</button>
   </div>`;
 
-  // ════ TAB 1: Simple Regression ════
+  // ════════════════════════════════════════════════
+  // TAB 1: الانحدار الخطي البسيط (كل X مع كل Y)
+  // ════════════════════════════════════════════════
   html+=`<div id="reg-simple" class="tc active">`;
-  let chartSimpleData=[];let chartSimpleLabels=[];
-  xAxes.forEach((xAx,xi2)=>{
-    yAxes.forEach(yAx=>{
-      const xi=axes.indexOf(xAx),yi=axes.indexOf(yAx);
-      const xv=getAxVals(xi,comp),yv=getAxVals(yi,comp);
-      const res=simpleOLS(xv,yv);
-      if(!res) return;
-      chartSimpleLabels.push(xAx.title);
-      chartSimpleData.push(parseFloat(res.R2.toFixed(3)));
-      html+=`<div class="spss-section" style="margin-bottom:1rem">
-        <div class="spss-head">
-          <div class="spss-head-title">📈 ${xAx.title} → ${yAx.title}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <span class="badge b-blue">R = ${res.R.toFixed(3)}</span>
-            <span class="badge b-purple">R² = ${res.R2.toFixed(3)}</span>
-            <span class="badge ${res.pF<.05?'b-green':'b-amber'}">${res.pF<.05?'دال ✓':'غير دال'}</span>
-          </div>
-        </div>
-        <div class="spss-body">
-          <!-- Model Summary -->
-          <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:.5rem">ملخص النموذج — Model Summary</div>
-          <div class="tbl-wrap"><table><thead><tr><th>معامل الارتباط (R)</th><th>معامل التحديد (R²)</th><th>R² المعدّل</th><th>الخطأ المعياري للتقدير</th></tr></thead><tbody>
-          <tr><td>${res.R.toFixed(3)}</td><td style="font-weight:700">${res.R2.toFixed(3)}</td>
-              <td>${(1-(1-res.R2)*(res.n-1)/(res.n-2)).toFixed(3)}</td>
-              <td>${Math.sqrt(res.MSres).toFixed(3)}</td></tr>
-          </tbody></table></div>
-          <!-- ANOVA -->
-          <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin:.875rem 0 .5rem">ANOVA</div>
-          ${regrAnovaTable(res,yAx.title,xAx.title)}
-          <!-- Coefficients -->
-          <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin:.875rem 0 .5rem">المعاملات</div>
-          ${regrCoefTable(res,xAx.title)}
-          <!-- Equation -->
-          <div style="margin-top:1rem;padding:.875rem 1.25rem;background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.04));border-radius:var(--r2);border:1px solid rgba(59,111,240,.15)">
-            <div style="font-size:12px;font-weight:700;color:var(--text2)">معادلة الانحدار:</div>
-            <div style="font-size:16px;font-weight:800;color:var(--accent);font-family:'Cairo',sans-serif;margin-top:4px">
-              Ŷ = ${res.b0.toFixed(3)} + ${res.b1.toFixed(3)} × X
-            </div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">
-              تفسير: المتغير "${xAx.title}" يُفسّر ${(res.R2*100).toFixed(1)}% من تباين "${yAx.title}"
+  if(!xAxes.length||!yAxes.length){
+    html+=`<div class="empty"><h3>لم يُحدَّد متغير مستقل (X) أو تابع (Y)</h3></div>`;
+  } else {
+    xAxes.forEach((xAx,xi2)=>{
+      yAxes.forEach(yAx=>{
+        const xi=axes.indexOf(xAx),yi=axes.indexOf(yAx);
+        const xv=getAxVals(xi,comp),yv=getAxVals(yi,comp);
+        const res=simpleOLS(xv,yv);
+        if(!res){html+=`<div class="empty"><h3>بيانات غير كافية: ${xAx.title} → ${yAx.title}</h3></div>`;return;}
+        html+=`<div class="spss-section" style="margin-bottom:1rem">
+          <div class="spss-head">
+            <div class="spss-head-title">📈 انحدار بسيط: ${xAx.title} → ${yAx.title}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span class="badge b-blue">R = ${res.R.toFixed(3)}</span>
+              <span class="badge b-purple">R² = ${res.R2.toFixed(3)}</span>
+              <span class="badge ${res.pF<.05?'b-green':'b-amber'}">${res.pF<.05?'دال ✓':'غير دال'}</span>
             </div>
           </div>
-          <!-- Scatter chart -->
-          <div style="margin-top:1rem;height:260px"><canvas id="c-reg-scatter-${xi2}"></canvas></div>
-        </div>
-      </div>`;
+          <div class="spss-body">
+            <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:.5rem">ملخص النموذج — Model Summary</div>
+            <div class="tbl-wrap"><table><thead><tr><th>R</th><th>R²</th><th>R² المعدّل</th><th>الخطأ المعياري</th></tr></thead><tbody>
+            <tr><td>${res.R.toFixed(3)}</td><td style="font-weight:700">${res.R2.toFixed(3)}</td>
+                <td>${(1-(1-res.R2)*(res.n-1)/(res.n-2)).toFixed(3)}</td>
+                <td>${Math.sqrt(res.MSres).toFixed(3)}</td></tr>
+            </tbody></table></div>
+            <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin:.875rem 0 .5rem">ANOVA</div>
+            ${regrAnovaTable(res,yAx.title,xAx.title)}
+            <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin:.875rem 0 .5rem">المعاملات</div>
+            ${regrCoefTable(res,xAx.title)}
+            <div style="margin-top:1rem;padding:.875rem 1.25rem;background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.04));border-radius:var(--r2);border:1px solid rgba(59,111,240,.15)">
+              <div style="font-size:12px;font-weight:700;color:var(--text2)">معادلة الانحدار:</div>
+              <div style="font-size:16px;font-weight:800;color:var(--accent);font-family:'Cairo',sans-serif;margin-top:4px">
+                Ŷ = ${res.b0.toFixed(3)} + ${res.b1.toFixed(3)} × X
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px">
+                تفسير: "${xAx.title}" يُفسّر ${(res.R2*100).toFixed(1)}% من تباين "${yAx.title}"
+              </div>
+            </div>
+            <div style="margin-top:1rem;height:260px"><canvas id="c-reg-scatter-${xi2}"></canvas></div>
+          </div>
+        </div>`;
+      });
     });
-  });
+  }
   html+=`</div>`;
 
-  // ════ TAB 2: Multiple Regression ════
+  // ════════════════════════════════════════════════
+  // TAB 2: الانحدار الخطي المتعدد (كل X معاً → كل Y)
+  // ════════════════════════════════════════════════
   html+=`<div id="reg-multiple" class="tc">`;
-  if(xAxes.length>=2){
+  if(xAxes.length<2){
+    html+=`<div class="empty"><h3>يلزم محورَان مستقلان (X) على الأقل للانحدار المتعدد</h3></div>`;
+  } else {
     yAxes.forEach(yAx=>{
       const yi=axes.indexOf(yAx);
       const yv=getAxVals(yi,comp);
       const Xmat=xAxes.map(xAx=>getAxVals(axes.indexOf(xAx),comp));
       const res=multipleOLS(Xmat,yv);
-      if(!res){html+=`<div class="empty"><h3>بيانات غير كافية للانحدار المتعدد</h3></div>`;return;}
+      if(!res){html+=`<div class="empty"><h3>بيانات غير كافية للانحدار المتعدد — ${yAx.title}</h3></div>`;return;}
+      const R2adj=(1-(1-res.R2)*(res.n-1)/(res.n-res.k-1));
       html+=`<div class="spss-section" style="margin-bottom:1rem">
         <div class="spss-head">
-          <div class="spss-head-title">📈 انحدار متعدد → ${yAx.title}</div>
-          <div style="display:flex;gap:8px">
+          <div class="spss-head-title">📈 انحدار متعدد: [${xAxes.map(a=>a.title).join(' + ')}] → ${yAx.title}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
             <span class="badge b-blue">R = ${res.R.toFixed(3)}</span>
             <span class="badge b-purple">R² = ${res.R2.toFixed(3)}</span>
+            <span class="badge b-green">R²adj = ${R2adj.toFixed(3)}</span>
             <span class="badge ${res.pF<.05?'b-green':'b-amber'}">${res.pF<.05?'دال ✓':'غير دال'}</span>
           </div>
         </div>
         <div class="spss-body">
-          <!-- Model Summary -->
           <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">ملخص النموذج — Model Summary</div>
-          <div class="tbl-wrap"><table><thead><tr><th>معامل الارتباط (R)</th><th>معامل التحديد (R²)</th><th>R² المعدّل</th><th>الخطأ المعياري للتقدير</th></tr></thead><tbody>
+          <div class="tbl-wrap"><table><thead><tr><th>R</th><th>R²</th><th>R² المعدّل</th><th>الخطأ المعياري</th></tr></thead><tbody>
           <tr><td>${res.R.toFixed(3)}</td><td style="font-weight:700">${res.R2.toFixed(3)}</td>
-              <td>${(1-(1-res.R2)*(res.n-1)/(res.n-res.k-1)).toFixed(3)}</td>
+              <td>${R2adj.toFixed(3)}</td>
               <td>${Math.sqrt(res.MSres).toFixed(3)}</td></tr></tbody></table></div>
-          <!-- ANOVA -->
           <div style="font-size:11px;font-weight:800;color:var(--text3);margin:.875rem 0 .5rem;text-transform:uppercase">ANOVA</div>
           <div class="tbl-wrap"><table><thead><tr><th>المصدر</th><th>SS</th><th>df</th><th>MS</th><th>F</th><th>Sig</th></tr></thead><tbody>
           <tr style="color:var(--green)"><td>الانحدار</td><td>${res.SSreg.toFixed(3)}</td><td>${res.k}</td><td>${(res.SSreg/res.k).toFixed(3)}</td>
               <td style="font-weight:700">${res.F.toFixed(3)}</td><td>${pSig(res.pF)}</td></tr>
           <tr><td>البواقي</td><td>${res.SSres.toFixed(3)}</td><td>${res.n-res.k-1}</td><td>${res.MSres.toFixed(3)}</td><td>—</td><td>—</td></tr>
-          <tr style="background:var(--bg4);font-weight:700"><td>الكلي</td><td>${res.SStot.toFixed(3)}</td><td>${res.n-1}</td><td>—</td><td>—</td><td><span class="badge ${res.pF<.05?'b-green':'b-amber'}">${res.pF<.05?'دال ✓':'غير دال'}</span></td></tr>
+          <tr style="background:var(--bg4);font-weight:700"><td>الكلي</td><td>${res.SStot.toFixed(3)}</td><td>${res.n-1}</td><td>—</td><td>—</td>
+              <td><span class="badge ${res.pF<.05?'b-green':'b-amber'}">${res.pF<.05?'دال ✓':'غير دال'}</span></td></tr>
           </tbody></table></div>
-          <!-- Coefficients -->
           <div style="font-size:11px;font-weight:800;color:var(--text3);margin:.875rem 0 .5rem;text-transform:uppercase">المعاملات — Coefficients</div>
-          <div class="tbl-wrap"><table><thead><tr><th>المتغير</th><th>B</th><th>Std.Error</th><th>Beta β</th><th>t</th><th>Sig</th><th>VIF*</th></tr></thead><tbody>
+          <div class="tbl-wrap"><table><thead><tr><th>المتغير</th><th>B</th><th>Std.Error</th><th>Beta β</th><th>t</th><th>Sig</th></tr></thead><tbody>
           <tr><td>الثابت</td><td>${res.betas[0].toFixed(3)}</td><td>${res.seB[0].toFixed(3)}</td><td>—</td>
-              <td>${res.tB[0].toFixed(3)}</td><td>${pSig(res.pB[0])}</td><td>—</td></tr>
+              <td>${res.tB[0].toFixed(3)}</td><td>${pSig(res.pB[0])}</td></tr>
           ${xAxes.map((xAx,j)=>{
             const b=res.betas[j+1],se=res.seB[j+1]||1,t=res.tB[j+1],p=res.pB[j+1],beta=res.bStd[j];
             return `<tr style="background:var(--bg3)"><td>${xAx.title}</td>
               <td><strong>${b.toFixed(3)}</strong></td><td>${se.toFixed(3)}</td>
               <td style="color:var(--accent);font-weight:700">${beta.toFixed(3)}</td>
-              <td style="font-weight:700">${t.toFixed(3)}</td><td>${pSig(p)}</td>
-              <td style="font-size:10px;color:var(--text3)">—</td></tr>`;
+              <td style="font-weight:700">${t.toFixed(3)}</td><td>${pSig(p)}</td></tr>`;
           }).join('')}
           </tbody></table></div>
-          <!-- Equation -->
           <div style="margin-top:1rem;padding:.875rem 1.25rem;background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.04));border-radius:var(--r2);border:1px solid rgba(59,111,240,.15)">
             <div style="font-size:12px;font-weight:700;color:var(--text2)">معادلة الانحدار المتعدد:</div>
             <div style="font-size:13px;font-weight:800;color:var(--accent);font-family:'Cairo',sans-serif;margin-top:4px;line-height:1.8">
-              Ŷ = ${res.betas[0].toFixed(3)} ${xAxes.map((xAx,j)=>`${res.betas[j+1]>=0?'+':''} ${res.betas[j+1].toFixed(3)}×X${j+1}`).join(' ')}
+              Ŷ = ${res.betas[0].toFixed(3)} ${xAxes.map((xAx,j)=>`${res.betas[j+1]>=0?'+':''} ${res.betas[j+1].toFixed(3)}×${xAx.title}`).join(' ')}
             </div>
           </div>
-          <!-- Bar chart: betas -->
           <div style="margin-top:1rem;height:220px"><canvas id="c-reg-betas"></canvas></div>
-          <div style="font-size:10px;color:var(--text3);margin-top:6px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS. *VIF يتطلب مصفوفة معكوسة كاملة.</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>
         </div>
       </div>`;
     });
-  } else {
-    html+=`<div class="empty"><h3>يلزم محورَان (X) على الأقل للانحدار المتعدد</h3></div>`;
   }
   html+=`</div>`;
 
-  // ════ TAB 3: Stepwise Regression ════
+  // ════════════════════════════════════════════════
+  // TAB 3: الانحدار التدريجي (Stepwise)
+  //   المتنبئات: أبعاد المتغير المستقل (X) فقط
+  //   المتغيرات التابعة: كل Y
+  // ════════════════════════════════════════════════
   html+=`<div id="reg-stepwise" class="tc">`;
-  yAxes.forEach(yAx=>{
-    const yi=axes.indexOf(yAx);
-    const yv=getAxVals(yi,comp);
-    // Collect predictors: each X axis's dims
-    let candidates=[];
-    xAxes.forEach(xAx=>{
-      const xi=axes.indexOf(xAx);
-      (xAx.dims||[]).forEach((dim,di)=>{
-        const v=getDimVals(xi,di,comp);
-        if(v.length>=3) candidates.push({name:dim.title||`${xAx.title}-${di+1}`,vals:v,axTitle:xAx.title});
+  // مقدمة توضيحية
+  html+=`<div style="background:rgba(59,111,240,.05);border:1px solid rgba(59,111,240,.15);border-radius:var(--r2);padding:.875rem 1.25rem;margin-bottom:1.25rem;font-size:12.5px;color:var(--text2);line-height:1.9">
+    <strong>📌 ملاحظة:</strong> يستخدم الانحدار التدريجي <strong>أبعاد المتغير(ات) المستقل(ة) (X)</strong> كمتنبئات محتملة، ويُدخلها تدريجياً نحو كل متغير تابع (Y) بحسب معيار F، مع معيار إدخال p &lt; 0.05 ومعيار إخراج p &gt; 0.10.
+  </div>`;
+
+  if(!xAxes.length||!yAxes.length){
+    html+=`<div class="empty"><h3>يلزم تحديد X وY في بناء الاستبيان</h3></div>`;
+  } else {
+    yAxes.forEach(yAx=>{
+      const yi=axes.indexOf(yAx);
+      const yv=getAxVals(yi,comp);
+      if(yv.length<3){html+=`<div class="empty"><h3>بيانات غير كافية لـ "${yAx.title}"</h3></div>`;return;}
+
+      // جمع أبعاد المتغيرات المستقلة كمتنبئات
+      let candidates=[];
+      xAxes.forEach(xAx=>{
+        const xi=axes.indexOf(xAx);
+        (xAx.dims||[]).forEach((dim,di)=>{
+          const v=getDimVals(xi,di,comp);
+          if(v.length>=3) candidates.push({name:dim.title||`${xAx.title} - بعد ${di+1}`,axTitle:xAx.title,vals:v,di});
+        });
+        // إذا لم تكن هناك أبعاد، استخدم المحور نفسه
       });
-    });
-    if(!candidates.length){
-      // fallback: use axes themselves
-      xAxes.forEach(xAx=>{const xi=axes.indexOf(xAx);candidates.push({name:xAx.title,vals:getAxVals(xi,comp),axTitle:xAx.title});});
-    }
-    // Forward stepwise
-    let entered=[],remaining=[...candidates];
-    const steps=[];
-    const MAX_STEPS=Math.min(candidates.length,6);
-    for(let step=0;step<MAX_STEPS&&remaining.length;step++){
-      let bestF=-Infinity,bestIdx=-1;
-      remaining.forEach((cand,ci)=>{
-        const trial=[...entered.map(e=>e.vals),cand.vals];
-        const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
-        if(!res) return;
-        if(res.F>bestF){bestF=res.F;bestIdx=ci;}
-      });
-      if(bestIdx<0) break;
-      const best=remaining[bestIdx];
-      entered.push(best);
-      remaining.splice(bestIdx,1);
-      const trial=entered.map(e=>e.vals);
-      const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
-      if(!res) break;
-      // Stopping criterion: p > 0.10
-      const lastP=res.pB?res.pB[res.pB.length-1]:res.pF;
-      steps.push({step:step+1,var:best.name,R2:res.R2,R2adj:1-(1-res.R2)*(res.n-1)/(res.n-entered.length-1),F:res.F,pF:res.pF,entered:[...entered]});
-      if(lastP>0.10) break;
-    }
-    html+=`<div class="spss-section"><div class="spss-head">
-      <div class="spss-head-title">📈 الانحدار التدريجي (Forward Stepwise) → ${yAx.title}</div>
-    </div><div class="spss-body">
-    <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">خطوات إدخال المتغيرات</div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>الخطوة</th><th>المتغير المدخل</th><th>R²</th><th>ΔR²</th><th>R² المعدّل</th><th>F</th><th>Sig F</th></tr></thead>
-      <tbody>`;
-    let prevR2=0;
-    steps.forEach(s=>{
-      html+=`<tr>
-        <td>${s.step}</td>
-        <td style="font-weight:700;color:var(--accent)">${s.var}</td>
-        <td style="font-weight:700">${s.R2.toFixed(3)}</td>
-        <td style="color:var(--green)">${(s.R2-prevR2).toFixed(3)}</td>
-        <td>${s.R2adj.toFixed(3)}</td>
-        <td>${s.F.toFixed(3)}</td>
-        <td>${pSig(s.pF)}</td></tr>`;
-      prevR2=s.R2;
-    });
-    html+=`</tbody></table></div>`;
-    if(steps.length){
-      // Final model table
-      const finalEntered=steps[steps.length-1].entered;
-      const finalXmat=finalEntered.map(e=>e.vals);
-      const finalRes=finalXmat.length===1?simpleOLS(finalXmat[0],yv):multipleOLS(finalXmat,yv);
-      if(finalRes){
-        html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);margin:.875rem 0 .5rem;text-transform:uppercase">النموذج النهائي — Final Model Coefficients</div>
-        <div class="tbl-wrap"><table>
-          <thead><tr><th>المتغير</th><th>B</th><th>Beta β</th><th>t</th><th>Sig</th></tr></thead><tbody>
-          <tr><td>الثابت</td><td>${finalRes.betas[0].toFixed(3)}</td><td>—</td><td>${finalRes.tB[0].toFixed(3)}</td><td>${pSig(finalRes.pB[0])}</td></tr>
-          ${finalEntered.map((e,j)=>`<tr style="background:var(--bg3)"><td style="font-weight:700;color:var(--accent)">${e.name}</td>
-            <td>${(finalRes.betas||finalRes.b1 && [0,finalRes.b1])[j+1]?.toFixed(3)||'—'}</td>
-            <td>${(finalRes.bStd||[0])[j]?.toFixed(3)||'—'}</td>
-            <td>${(finalRes.tB||[0,finalRes.t1])[j+1]?.toFixed(3)||'—'}</td>
-            <td>${pSig((finalRes.pB||[0,finalRes.pt1])[j+1]||1)}</td></tr>`).join('')}
-          </tbody></table></div>
-        <div style="margin-top:.75rem;padding:.75rem 1rem;background:linear-gradient(135deg,rgba(5,150,105,.06),rgba(59,111,240,.04));border-radius:var(--r2);font-size:12px;color:var(--text2)">
-          المتغيرات الداخلة: ${finalEntered.map(e=>'<strong>'+e.name+'</strong>').join('، ')} | R² = <strong>${(steps[steps.length-1]?.R2||0).toFixed(3)}</strong>
-        </div>`;
+      if(!candidates.length){
+        xAxes.forEach(xAx=>{
+          const xi=axes.indexOf(xAx);
+          const v=getAxVals(xi,comp);
+          if(v.length>=3) candidates.push({name:xAx.title,axTitle:xAx.title,vals:v});
+        });
       }
-      // Stepwise R² chart
-      html+=`<div style="margin-top:1rem;height:220px"><canvas id="c-stepwise-${yi}"></canvas></div>`;
-    }else{
-      html+=`<div class="empty" style="padding:1rem"><h3>لم تُدخَل أي متغيرات (p &gt; 0.10)</h3></div>`;
-    }
-    // ── جدول Variables Entered/Removed ──
-    const excludedCands=candidates.filter(c=>!steps.find(s=>s.var===c.name));
-    html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);margin:.875rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">Variables Entered/Removed</div>
-    <div class="tbl-wrap"><table>
-      <thead><tr>
-        <th>النموذج</th><th>المتغيرات المُدخَلة</th><th>المتغيرات المُستبعَدة</th><th>الطريقة</th>
-      </tr></thead><tbody>
-      ${steps.map((s,si)=>`<tr style="background:${si%2===0?'transparent':'rgba(59,111,240,.025)'}">
-        <td>${s.step}</td>
-        <td style="color:var(--green);font-weight:700">${s.var}</td>
-        <td style="color:var(--red);font-size:11px">${si===steps.length-1?excludedCands.map(e=>e.name).join('، ')||'—':'—'}</td>
-        <td>Forward Stepwise (F ≥ 3.84)</td>
-      </tr>`).join('')}
-      </tbody></table></div>`;
+      if(!candidates.length){html+=`<div class="empty"><h3>لا توجد أبعاد كافية لـ X</h3></div>`;return;}
 
-    html+=`<div style="font-size:10px;color:var(--text3);margin-top:8px">المصدر: من إعداد الباحث. معيار الإدخال p&lt;0.05، معيار الإخراج p&gt;0.10.</div>`;
+      // Forward Stepwise
+      let entered=[],remaining=[...candidates],steps=[];
+      const pR2=(r,n2)=>{const t=r*Math.sqrt((n2-2)/(1-r*r+1e-10));return pFromT(t,n2-2);};
+      const MAX_STEPS=Math.min(candidates.length,8);
+      for(let step=0;step<MAX_STEPS&&remaining.length;step++){
+        let bestF=-Infinity,bestIdx=-1;
+        remaining.forEach((cand,ci)=>{
+          const trial=[...entered.map(e=>e.vals),cand.vals];
+          const res=trial.length===1?simpleOLS(trial[0],yv):multipleOLS(trial,yv);
+          if(res&&res.F>bestF){bestF=res.F;bestIdx=ci;}
+        });
+        if(bestIdx<0) break;
+        const best=remaining[bestIdx];
+        entered.push(best);
+        remaining.splice(bestIdx,1);
+        const trialVals=entered.map(e=>e.vals);
+        const res=trialVals.length===1?simpleOLS(trialVals[0],yv):multipleOLS(trialVals,yv);
+        if(!res) break;
+        const lastP=res.pB?res.pB[res.pB.length-1]:res.pF;
+        const prevR2=steps.length?steps[steps.length-1].R2:0;
+        const R2adj=1-(1-res.R2)*(yv.length-1)/(yv.length-entered.length-1);
+        steps.push({
+          step:step+1, varName:best.name, axTitle:best.axTitle,
+          R:Math.sqrt(res.R2), R2:res.R2, R2adj, F:res.F, pF:res.pF,
+          deltaR2:res.R2-prevR2,
+          entered:[...entered], remaining:[...remaining],
+          res
+        });
+        if(lastP>0.10) break;
+      }
+      const excludedCands=candidates.filter(c=>!steps.find(s=>s.varName===c.name));
 
-    // ── جدول Excluded Variables ──
-    if(excludedCands.length){
-      html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">Excluded Variables</div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>المتغير</th><th>Beta In</th><th>t</th><th>Sig</th><th>Partial r</th><th>سبب الاستبعاد</th></tr></thead>
-        <tbody>
-        ${excludedCands.map(ec=>{
-          const ecv=ec.vals,yv2=yv;
-          const r=pearson(ecv,yv2);
-          const pr=pR(r,n);
-          const finalBetas=steps.length?steps[steps.length-1].entered:[]; 
-          const beta=r*(stdS(ecv)||1)/(stdS(yv2)||1);
-          return `<tr><td style="color:var(--red);font-weight:700">${ec.name}</td>
-            <td>${beta.toFixed(3)}</td>
-            <td>${(r*Math.sqrt((n-2)/(1-r*r+1e-10))).toFixed(3)}</td>
-            <td>${pSig(pr)}</td>
-            <td>${r.toFixed(3)}</td>
-            <td style="font-size:11px;color:var(--text3)">${pr>=.05?'ضعف الدلالة الإحصائية (p≥0.05)':'ارتباط جزئي ضعيف'}</td></tr>`;
-        }).join('')}
-        </tbody></table></div>`;
-    }
-
-    // ── جدول ملخص شامل للانحدار ──
-    if(steps.length){
-      const finalS=steps[steps.length-1];
-      const finalEntered2=finalS.entered;
-      const finalXmat2=finalEntered2.map(e=>e.vals);
-      const finalRes2=finalXmat2.length===1?simpleOLS(finalXmat2[0],yv):multipleOLS(finalXmat2,yv);
-      const R2final=finalS.R2,Rfinal=Math.sqrt(R2final),Ffinal=finalS.F;
-
-      html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);margin:1.25rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px">📋 جدول ملخص نتائج الانحدار الخطي التدريجي</div>
-      <div class="tbl-wrap"><table>
-        <thead>
-          <tr style="background:linear-gradient(135deg,rgba(59,111,240,.12),rgba(124,58,237,.08))">
-            <th>النموذج</th><th>البعد المقبول</th><th>قيمة T</th>
-            <th>β (معياري)</th><th>B (غير معياري)</th>
-            <th>معامل الارتباط R</th><th>معامل التحديد R²</th>
-            <th>قيمة F</th><th>الدلالة Sig</th>
-          </tr>
-        </thead><tbody>
-        ${finalEntered2.map((e,j)=>{
-          const b=finalRes2?.betas?.[j+1]??finalRes2?.b1??0;
-          const beta=finalRes2?.bStd?.[j]??0;
-          const t=finalRes2?.tB?.[j+1]??finalRes2?.t1??0;
-          const sig=finalRes2?.pB?.[j+1]??finalRes2?.pt1??1;
-          return `<tr style="background:${j%2===0?'rgba(59,111,240,.03)':'transparent'}">
-            <td style="font-weight:700">${j+1}</td>
-            <td style="font-weight:700;color:var(--accent)">${e.name}</td>
-            <td style="font-weight:700;color:${Math.abs(t)>2?'var(--green)':'var(--amber)'}">${t.toFixed(3)}</td>
-            <td style="color:var(--purple);font-weight:700">${beta.toFixed(3)}</td>
-            <td>${b.toFixed(3)}</td>
-            <td style="font-weight:700;color:var(--accent)">${Rfinal.toFixed(3)}</td>
-            <td style="font-weight:700;color:var(--purple)">${R2final.toFixed(3)}</td>
-            <td>${Ffinal.toFixed(3)}</td>
-            <td><span class="badge ${finalS.pF<.05?'b-green':'b-amber'}">${pSig(finalS.pF)}</span></td>
-          </tr>`;
-        }).join('')}
-        <tr style="background:var(--bg4);font-weight:700;border-top:2px solid var(--border2)">
-          <td colspan="2">النموذج الكلي</td>
-          <td>—</td><td>—</td><td>${(finalRes2?.betas?.[0]??finalRes2?.b0??0).toFixed(3)}</td>
-          <td>${Rfinal.toFixed(3)}</td><td>${R2final.toFixed(3)}</td>
-          <td>${Ffinal.toFixed(3)}</td>
-          <td><span class="badge ${finalS.pF<.05?'b-green':'b-amber'}">${pSig(finalS.pF)}</span></td>
-        </tr>
-        </tbody></table></div>
-      <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>`;
-
-      // ── التفسير الأكاديمي ──
-      const acceptedDim=finalEntered2[0];
-      const excludedNames=excludedCands.map(e=>e.name);
-      const b0Final=(finalRes2?.betas?.[0]??finalRes2?.b0??0).toFixed(3);
-      const b1Final=(finalRes2?.betas?.[1]??finalRes2?.b1??0).toFixed(3);
-      const betaFinal=(finalRes2?.bStd?.[0]??0).toFixed(3);
-
-      const excl_str=excludedNames.length>=2
-        ? `بُعدَي <strong>"${excludedNames[0]}"</strong> و<strong>"${excludedNames[1]}"</strong>`
-        : excludedNames.length===1
-        ? `بُعد <strong>"${excludedNames[0]}"</strong>`
-        : 'بعض الأبعاد';
-
-      html+=`<div style="margin-top:1.5rem;background:linear-gradient(135deg,rgba(59,111,240,.04),rgba(124,58,237,.03));border:1px solid rgba(59,111,240,.15);border-right:4px solid var(--accent);border-radius:var(--r2);padding:1.25rem 1.5rem">
-        <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:8px">
-          📝 <span>تفسير نتائج الانحدار الخطي التدريجي (Forward Stepwise)</span>
+      html+=`<div class="spss-section" style="margin-bottom:1.5rem">
+        <div class="spss-head">
+          <div class="spss-head-title">📈 انحدار تدريجي → المتغير التابع: ${yAx.title}</div>
+          <span class="badge b-red">Y</span>
         </div>
-        <div style="font-size:13px;color:var(--text2);line-height:2;text-align:justify">
-          <p>نلاحظ من خلال الجدول أعلاه أنه تم استبعاد ${excl_str} لضعف الارتباط الجزئي وعدم دلالة تأثيرهما على <strong>"${yAx.title}"</strong>، بينما تم الإبقاء على <strong>"${acceptedDim?.name||'البعد المقبول'}"</strong> باعتباره المتغير الأكثر تأثيراً في النموذج النهائي.</p>
-          <br>
-          <p>وقد بلغ معامل الارتباط <strong>(R = ${Rfinal.toFixed(3)})</strong>، كما بلغ معامل التحديد <strong>(R² = ${R2final.toFixed(3)})</strong>، أي أن <strong>${(R2final*100).toFixed(1)}%</strong> من التباين الحاصل في <strong>"${yAx.title}"</strong> يمكن تفسيره من خلال <strong>"${acceptedDim?.name||''}"</strong>. كما بلغت قيمة <strong>(F = ${Ffinal.toFixed(3)})</strong> وهي أكبر من القيمة الجدولية ودالة إحصائياً عند مستوى الدلالة (α ≤ 0.05)، حيث بلغ مستوى المعنوية <strong>(Sig = ${pSig(finalS.pF)})</strong>.</p>
-          <br>
-          <p>وبذلك يمكن التعبير عن معادلة الانحدار كما يلي:</p>
-          <div style="margin:1rem 0;padding:.875rem 1.25rem;background:rgba(59,111,240,.08);border-radius:var(--r2);text-align:center;font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;color:var(--accent)">
-            Ŷ = ${b0Final} + ${b1Final} × X + e<sub>i</sub>
-          </div>
-          <p style="margin-top:.5rem">حيث أن:</p>
-          <ul style="margin:8px 0 8px 1.5rem;line-height:2">
-            <li><strong>α = ${b0Final}</strong> : ثابت معادلة الانحدار</li>
-            <li><strong>β = ${betaFinal}</strong> : معامل الانحدار الموحّد</li>
-            <li><strong>B = ${b1Final}</strong> : معامل الانحدار غير الموحّد</li>
-            <li><strong>Y</strong> : المتغير التابع "${yAx.title}"</li>
-            <li><strong>X</strong> : البعد المقبول "${acceptedDim?.name||''}"</li>
-            <li><strong>e<sub>i</sub></strong> : متغير عشوائي (عوامل أخرى غير مدرجة)</li>
-          </ul>
-          <p>وبما أن مستوى المعنوية <strong>(Sig = ${pSig(finalS.pF)})</strong> أقل من مستوى الدلالة (0.05)، فإننا <span style="color:var(--green);font-weight:700">نرفض الفرضية الصفرية H₀</span> ونقبل الفرضية البديلة H₁ التي تنص على وجود أثر ذي دلالة إحصائية.</p>
-          <br>
-          <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem">
-            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:.5rem">💡 التحليل الاقتصادي والمهني:</div>
-            <p>تشير النتائج إلى أن <strong>"${acceptedDim?.name||''}"</strong> يمثل البعد الأكثر تأثيراً في <strong>"${yAx.title}"</strong>. وتُؤكد مساهمته في تفسير <strong>${(R2final*100).toFixed(1)}%</strong> من التباين أهميته ودوره في تعزيز وتحسين "${yAx.title}"، رغم وجود عوامل أخرى قد تسهم كذلك في تفسير الجزء المتبقي (<strong>${(100-R2final*100).toFixed(1)}%</strong>) من التباين.</p>
-          </div>
-        </div>
-      </div>`;
-    }
+        <div class="spss-body">`;
 
-    html+=`</div></div>`;
-  });
+      if(!steps.length){
+        html+=`<div style="text-align:center;padding:2rem;color:var(--amber)">⚠️ لم يُدخَل أي متغير — جميع المتنبئات p &gt; 0.10</div>`;
+      } else {
+        const finalStep=steps[steps.length-1];
+        const finalRes=finalStep.res;
+
+        // 1. Variables Entered/Removed
+        html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:.5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 Variables Entered / Removed</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>النموذج</th><th>البُعد المدخل</th><th>المحور</th><th>المتغيرات المحذوفة</th><th>الطريقة</th></tr></thead>
+          <tbody>
+          ${steps.map((s,si)=>`<tr>
+            <td style="font-weight:700">${si+1}</td>
+            <td style="color:var(--green);font-weight:700">${s.varName}</td>
+            <td style="font-size:11px;color:var(--text3)">${s.axTitle}</td>
+            <td style="color:var(--red);font-size:11px">${si===steps.length-1&&excludedCands.length?excludedCands.map(e=>e.name).join('، '):'—'}</td>
+            <td><span class="badge b-blue">Forward Stepwise</span></td>
+          </tr>`).join('')}
+          </tbody></table></div>`;
+
+        // 2. Model Summary
+        html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 Model Summary</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>النموذج</th><th>R</th><th>R²</th><th>ΔR²</th><th>R² المعدّل</th><th>الخطأ المعياري</th></tr></thead>
+          <tbody>
+          ${steps.map((s,si)=>{
+            const trRes=s.entered.length===1?simpleOLS(s.entered[0].vals,yv):multipleOLS(s.entered.map(e=>e.vals),yv);
+            const se=trRes?Math.sqrt(trRes.MSres).toFixed(3):'—';
+            return `<tr ${si===steps.length-1?'style="background:rgba(5,150,105,.06);font-weight:700"':''}>
+              <td>${si+1}</td>
+              <td>${s.R.toFixed(3)}</td>
+              <td><strong>${s.R2.toFixed(3)}</strong></td>
+              <td style="color:var(--green)">${s.deltaR2.toFixed(3)}</td>
+              <td>${s.R2adj.toFixed(3)}</td>
+              <td>${se}</td>
+            </tr>`;
+          }).join('')}
+          </tbody></table></div>`;
+
+        // 3. ANOVA لكل خطوة
+        html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 ANOVA</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>النموذج</th><th>المصدر</th><th>SS</th><th>df</th><th>MS</th><th>F</th><th>Sig</th></tr></thead>
+          <tbody>
+          ${steps.map((s,si)=>{
+            const k2=s.entered.length;
+            const trRes=s.entered.length===1?simpleOLS(s.entered[0].vals,yv):multipleOLS(s.entered.map(e=>e.vals),yv);
+            if(!trRes) return '';
+            return `<tr ${si===steps.length-1?'style="font-weight:700"':''}>
+              <td rowspan="3" style="vertical-align:middle;font-weight:700">${si+1}</td>
+              <td style="color:var(--green)">الانحدار</td>
+              <td>${trRes.SSreg.toFixed(3)}</td><td>${k2}</td><td>${(trRes.SSreg/k2).toFixed(3)}</td>
+              <td style="font-weight:700">${trRes.F.toFixed(3)}</td><td>${pSig(trRes.pF)}</td></tr>
+            <tr ${si===steps.length-1?'style="font-weight:700"':''}><td>البواقي</td>
+              <td>${trRes.SSres.toFixed(3)}</td><td>${yv.length-k2-1}</td><td>${trRes.MSres.toFixed(3)}</td><td>—</td><td>—</td></tr>
+            <tr ${si===steps.length-1?'style="background:var(--bg4);font-weight:700"':''}><td>الكلي</td>
+              <td>${trRes.SStot.toFixed(3)}</td><td>${yv.length-1}</td><td>—</td><td>—</td>
+              <td><span class="badge ${trRes.pF<.05?'b-green':'b-amber'}">${trRes.pF<.05?'دال ✓':'غير دال'}</span></td></tr>`;
+          }).join('')}
+          </tbody></table></div>`;
+
+        // 4. Coefficients of final model
+        html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(59,111,240,.05);border-radius:var(--r3)">📋 Coefficients — النموذج النهائي</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>المتغير</th><th>B</th><th>Std.Error</th><th>Beta β</th><th>t</th><th>Sig</th></tr></thead>
+          <tbody>
+          <tr><td>الثابت</td>
+            <td>${(finalRes.betas?.[0]??finalRes.b0??0).toFixed(3)}</td>
+            <td>${(finalRes.seB?.[0]??finalRes.se0??0).toFixed(3)}</td>
+            <td>—</td>
+            <td>${(finalRes.tB?.[0]??finalRes.t0??0).toFixed(3)}</td>
+            <td>${pSig(finalRes.pB?.[0]??finalRes.pt0??1)}</td></tr>
+          ${finalStep.entered.map((e,j)=>{
+            const b=finalRes.betas?.[j+1]??finalRes.b1??0;
+            const se=finalRes.seB?.[j+1]??finalRes.seb??0;
+            const beta=finalRes.bStd?.[j]??0;
+            const t=finalRes.tB?.[j+1]??finalRes.t1??0;
+            const p=finalRes.pB?.[j+1]??finalRes.pt1??1;
+            return `<tr style="background:var(--bg3)">
+              <td style="font-weight:700;color:var(--accent)">${e.name}</td>
+              <td><strong>${b.toFixed(3)}</strong></td>
+              <td>${se.toFixed(3)}</td>
+              <td style="color:var(--purple);font-weight:700">${beta.toFixed(3)}</td>
+              <td style="font-weight:700;color:${Math.abs(t)>2?'var(--green)':'var(--amber)'}">${t.toFixed(3)}</td>
+              <td>${pSig(p)}</td>
+            </tr>`;
+          }).join('')}
+          </tbody></table></div>`;
+
+        // 5. Excluded Variables
+        if(excludedCands.length){
+          html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1rem 0 .5rem;padding:6px 10px;background:rgba(220,38,38,.05);border-radius:var(--r3)">📋 Excluded Variables</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>البُعد المستبعد</th><th>المحور</th><th>r جزئي</th><th>t</th><th>Sig</th><th>سبب الاستبعاد</th></tr></thead>
+            <tbody>
+            ${excludedCands.map(ec=>{
+              const r=pearson(ec.vals,yv),n2=Math.min(ec.vals.length,yv.length);
+              const t=r*Math.sqrt((n2-2)/(1-r*r+1e-10));
+              const p=pFromT(Math.abs(t),n2-2)*2;
+              return `<tr>
+                <td style="color:var(--red);font-weight:700">${ec.name}</td>
+                <td style="font-size:11px;color:var(--text3)">${ec.axTitle}</td>
+                <td>${r.toFixed(3)}</td>
+                <td>${t.toFixed(3)}</td>
+                <td>${pSig(p)}</td>
+                <td style="font-size:11px;color:var(--text3)">${p>=.05?'p ≥ 0.05 (ضعف الدلالة)':'ارتباط جزئي ضعيف'}</td>
+              </tr>`;
+            }).join('')}
+            </tbody></table></div>`;
+        }
+
+        // 6. جدول ملخص نتائج الانحدار التدريجي
+        html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:1.25rem 0 .5rem;padding:6px 10px;background:rgba(124,58,237,.06);border-radius:var(--r3)">📊 جدول ملخص نتائج الانحدار الخطي التدريجي</div>
+        <div class="tbl-wrap"><table>
+          <thead>
+            <tr style="background:linear-gradient(135deg,rgba(59,111,240,.12),rgba(124,58,237,.08))">
+              <th>النموذج</th><th>البُعد المُدخَل</th><th>المحور</th>
+              <th>B</th><th>Beta β</th><th>t</th><th>Sig (t)</th>
+              <th>R</th><th>R²</th><th>ΔR²</th><th>F</th><th>Sig (F)</th>
+            </tr>
+          </thead><tbody>
+          ${steps.map((s,si)=>{
+            const trRes=s.entered.length===1?simpleOLS(s.entered[0].vals,yv):multipleOLS(s.entered.map(e=>e.vals),yv);
+            const j=s.entered.length-1; // index of new predictor
+            const b=trRes?.betas?.[j+1]??trRes?.b1??0;
+            const beta=trRes?.bStd?.[j]??0;
+            const t=trRes?.tB?.[j+1]??trRes?.t1??0;
+            const pt=trRes?.pB?.[j+1]??trRes?.pt1??1;
+            return `<tr style="background:${si%2===0?'rgba(59,111,240,.025)':'transparent'}${si===steps.length-1?';font-weight:700':''}">
+              <td style="font-weight:700">${si+1}</td>
+              <td style="color:var(--accent);font-weight:700">${s.varName}</td>
+              <td style="font-size:11px;color:var(--text3)">${s.axTitle}</td>
+              <td>${b.toFixed(3)}</td>
+              <td style="color:var(--purple);font-weight:700">${beta.toFixed(3)}</td>
+              <td style="color:${Math.abs(t)>2?'var(--green)':'var(--amber)'};font-weight:700">${t.toFixed(3)}</td>
+              <td>${pSig(pt)}</td>
+              <td style="color:var(--accent)">${s.R.toFixed(3)}</td>
+              <td style="color:var(--purple);font-weight:700">${s.R2.toFixed(3)}</td>
+              <td style="color:var(--green)">${s.deltaR2.toFixed(3)}</td>
+              <td>${s.F.toFixed(3)}</td>
+              <td><span class="badge ${s.pF<.05?'b-green':'b-amber'}">${pSig(s.pF)}</span></td>
+            </tr>`;
+          }).join('')}
+          </tbody></table></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">المصدر: من إعداد الباحث اعتماداً على نتائج SPSS. معيار الإدخال p&lt;0.05 | معيار الإخراج p&gt;0.10</div>`;
+
+        // معادلة الانحدار النهائية
+        const b0Fin=(finalRes.betas?.[0]??finalRes.b0??0).toFixed(3);
+        html+=`<div style="margin-top:1rem;padding:.875rem 1.25rem;background:linear-gradient(135deg,rgba(59,111,240,.06),rgba(124,58,237,.04));border-radius:var(--r2);border:1px solid rgba(59,111,240,.15)">
+          <div style="font-size:12px;font-weight:700;color:var(--text2)">معادلة الانحدار النهائية:</div>
+          <div style="font-size:13px;font-weight:800;color:var(--accent);font-family:'Cairo',sans-serif;margin-top:6px;line-height:2">
+            Ŷ (${yAx.title}) = ${b0Fin}${finalStep.entered.map((e,j)=>{
+              const b=finalRes.betas?.[j+1]??finalRes.b1??0;
+              return ` ${b>=0?'+':''} ${b.toFixed(3)} × ${e.name}`;
+            }).join('')}
+          </div>
+          <div style="font-size:11.5px;color:var(--text2);margin-top:8px;line-height:1.9">
+            <strong>التفسير:</strong> الأبعاد الداخلة في النموذج تُفسّر <strong>${(finalStep.R2*100).toFixed(1)}%</strong> من تباين
+            "${yAx.title}" (R² = ${finalStep.R2.toFixed(3)}, F = ${finalStep.F.toFixed(3)}, ${pSig(finalStep.pF)}).
+            ${excludedCands.length?`الأبعاد المستبعدة: <strong>${excludedCands.map(e=>e.name).join('، ')}</strong>.`:''}
+          </div>
+        </div>`;
+
+        // R² chart
+        html+=`<div style="margin-top:1rem;height:220px"><canvas id="c-stepwise-${yi}"></canvas></div>`;
+      }
+      html+=`</div></div>`;
+    });
+  }
   html+=`</div>`;
 
   cont.innerHTML += html;
 
-  // Draw charts
+  // ── رسم المخططات ──
   setTimeout(()=>{
-    // Scatter plots
+    // Scatter plots (simple)
     xAxes.forEach((xAx,xi2)=>{
       yAxes.forEach(yAx=>{
         const xi=axes.indexOf(xAx),yi=axes.indexOf(yAx);
@@ -3391,17 +3357,23 @@ function renderRegression(){
         charts[cid]=new Chart(ctx,{
           type:'scatter',
           data:{datasets:[
-            {label:'القيم الفعلية',data:xv.map((x,i)=>({x,y:yv[i]})),backgroundColor:'rgba(59,111,240,.5)',pointRadius:5},
-            {label:'خط الانحدار',data:xv.map((x)=>({x,y:res.b0+res.b1*x})).sort((a,b)=>a.x-b.x),type:'line',borderColor:'#dc2626',borderWidth:2,pointRadius:0,fill:false}
+            {label:'القيم الفعلية',data:xv.map((x,i)=>({x,y:yv[i]||0})),backgroundColor:'rgba(59,111,240,.5)',pointRadius:5},
+            {label:'خط الانحدار',data:[...xv].sort((a,b)=>a-b).map(x=>({x,y:res.b0+res.b1*x})),type:'line',borderColor:'#dc2626',borderWidth:2,pointRadius:0,fill:false}
           ]},
-          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{family:'Tajawal',size:10},color:isDark?'#94a3c0':'#6b7280'}}},
-            scales:{x:{title:{display:true,text:xAx.title,font:{family:'Tajawal'},color:isDark?'#94a3c0':'#6b7280'},grid:{color:isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)'},ticks:{color:isDark?'#94a3c0':'#6b7280'}},
-              y:{title:{display:true,text:yAx.title,font:{family:'Tajawal'},color:isDark?'#94a3c0':'#6b7280'},grid:{color:isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)'},ticks:{color:isDark?'#94a3c0':'#6b7280'}}}}
+          options:{responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{labels:{font:{family:'Tajawal',size:10},color:isDark?'#94a3c0':'#6b7280'}}},
+            scales:{
+              x:{title:{display:true,text:xAx.title,font:{family:'Tajawal'},color:isDark?'#94a3c0':'#6b7280'},
+                grid:{color:isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)'},ticks:{color:isDark?'#94a3c0':'#6b7280'}},
+              y:{title:{display:true,text:yAx.title,font:{family:'Tajawal'},color:isDark?'#94a3c0':'#6b7280'},
+                grid:{color:isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)'},ticks:{color:isDark?'#94a3c0':'#6b7280'}}
+            }
+          }
         });
       });
     });
 
-    // Multiple betas bar chart
+    // Betas bar (multiple)
     if(xAxes.length>=2){
       const cid='c-reg-betas';
       if(charts[cid]) charts[cid].destroy();
@@ -3411,27 +3383,32 @@ function renderRegression(){
         const Xmat=xAxes.map(xAx=>getAxVals(axes.indexOf(xAx),comp));
         const res=multipleOLS(Xmat,yv);
         if(res){
+          const isDark=document.documentElement.getAttribute('data-theme')==='dark';
           charts[cid]=new Chart(ctx,{type:'bar',
             data:{labels:xAxes.map(ax=>ax.title),
-              datasets:[{label:'Beta β',data:res.bStd,backgroundColor:xAxes.map((_,i)=>['rgba(59,111,240,.7)','rgba(124,58,237,.7)','rgba(5,150,105,.7)','rgba(217,119,6,.7)'][i%4])}]},
-            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'Beta β'}}}}
+              datasets:[{label:'Beta β',data:res.bStd,
+                backgroundColor:xAxes.map((_,i)=>['rgba(59,111,240,.7)','rgba(124,58,237,.7)','rgba(5,150,105,.7)','rgba(217,119,6,.7)'][i%4])}]},
+            options:{responsive:true,maintainAspectRatio:false,
+              plugins:{legend:{display:false}},
+              scales:{y:{title:{display:true,text:'Beta β'},ticks:{color:isDark?'#94a3c0':'#6b7280'}},
+                x:{ticks:{color:isDark?'#94a3c0':'#6b7280',font:{family:'Tajawal'}}}}}
           });
         }
       }
     }
 
-    // Stepwise R² line chart
-    yAxes.forEach((yAx,yi)=>{
-      const cid=`c-stepwise-${axes.indexOf(yAx)}`;
+    // Stepwise R² line charts
+    yAxes.forEach(yAx=>{
+      const yi=axes.indexOf(yAx);
+      const cid=`c-stepwise-${yi}`;
       const el=document.getElementById(cid);
       if(!el) return;
-      // rebuild steps for chart
-      const yv=getAxVals(axes.indexOf(yAx),comp);
+      const yv=getAxVals(yi,comp);
       let cands2=[];
       xAxes.forEach(xAx=>{const xi=axes.indexOf(xAx);(xAx.dims||[]).forEach((dim,di)=>{const v=getDimVals(xi,di,comp);if(v.length>=3)cands2.push({name:dim.title,vals:v});});});
       if(!cands2.length) xAxes.forEach(xAx=>{cands2.push({name:xAx.title,vals:getAxVals(axes.indexOf(xAx),comp)});});
       let ent2=[],rem2=[...cands2],stps2=[];
-      for(let s=0;s<Math.min(cands2.length,6)&&rem2.length;s++){
+      for(let s=0;s<Math.min(cands2.length,8)&&rem2.length;s++){
         let bF=-Infinity,bI=-1;
         rem2.forEach((c,ci)=>{const t=[...ent2.map(e=>e.vals),c.vals];const r=t.length===1?simpleOLS(t[0],yv):multipleOLS(t,yv);if(r&&r.F>bF){bF=r.F;bI=ci;}});
         if(bI<0) break;
@@ -3443,10 +3420,15 @@ function renderRegression(){
       }
       if(!stps2.length) return;
       if(charts[cid]) charts[cid].destroy();
+      const isDark=document.documentElement.getAttribute('data-theme')==='dark';
       const ctx=el.getContext('2d');
       charts[cid]=new Chart(ctx,{type:'line',
-        data:{labels:stps2.map(s=>s.var),datasets:[{label:'R²',data:stps2.map(s=>s.R2),borderColor:'#3b6ff0',backgroundColor:'rgba(59,111,240,.1)',borderWidth:2,pointRadius:6,fill:true,tension:.3}]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:1,title:{display:true,text:'R²'}}},plugins:{legend:{display:false}}}
+        data:{labels:stps2.map(s=>s.var),
+          datasets:[{label:'R²',data:stps2.map(s=>s.R2),borderColor:'#3b6ff0',backgroundColor:'rgba(59,111,240,.1)',borderWidth:2,pointRadius:6,fill:true,tension:.3}]},
+        options:{responsive:true,maintainAspectRatio:false,
+          scales:{y:{min:0,max:1,title:{display:true,text:'R²'},ticks:{color:isDark?'#94a3c0':'#6b7280'}},
+            x:{ticks:{color:isDark?'#94a3c0':'#6b7280',font:{family:'Tajawal'}}}},
+          plugins:{legend:{display:false}}}
       });
     });
   },100);
