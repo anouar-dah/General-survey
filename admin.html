@@ -2503,7 +2503,11 @@ function renderCorrelation(){
       const dimVals=getDimVals(ai,di,comp);
       if(dimVals.length<2) return;
       const qValsArr=qs.map((_,qi)=>getQVals(ai,di,qi,comp));
-      const qLabels=qs.map((_,qi)=>`${axSym}D${di+1}Q${qi+1}`);
+      // ترميز: X1_1، X1_2... أو Y1_1، Y1_2... (محور_رقم السؤال)
+      // نحسب الرقم التراكمي للسؤال داخل المحور
+      let qOffset=0;
+      for(let dj=0;dj<di;dj++) qOffset+=(ax.dims[dj].questions||[]).length;
+      const qLabels=qs.map((_,qi)=>`${axSym}_${qOffset+qi+1}`);
 
       html+=`<div class="spss-section" style="margin-bottom:1.25rem">
         <div class="spss-head">
@@ -2542,8 +2546,41 @@ function renderCorrelation(){
         </tr>`;
       });
       html+=`</tbody></table></div>
-        <div style="font-size:10px;color:var(--text3);margin-top:5px">*** p&lt;0.001 | ** p&lt;0.01 | * p&lt;0.05 | ns: غير دال | المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>
-      </div></div>`;
+        <div style="font-size:10px;color:var(--text3);margin-top:5px">*** p&lt;0.001 | ** p&lt;0.01 | * p&lt;0.05 | ns: غير دال | المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>`;
+
+      // ── مصفوفة ارتباط بيرسون بين أسئلة البعد ──
+      if(qs.length>=2){
+        const validQ=qLabels.map((lbl,qi)=>({lbl,vals:qValsArr[qi]})).filter(q=>q.vals.length>=2);
+        if(validQ.length>=2){
+          html+=`<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin:1.25rem 0 .5rem">
+            مصفوفة ارتباط بيرسون بين أسئلة البعد (Inter-Item Correlation Matrix)</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr>
+              <th></th>
+              ${validQ.map(q=>`<th style="color:var(--accent);font-weight:800">${q.lbl}</th>`).join('')}
+            </tr></thead>
+            <tbody>`;
+          validQ.forEach((qi_,i)=>{
+            html+=`<tr><td style="font-weight:800;color:var(--accent)">${qi_.lbl}</td>`;
+            validQ.forEach((qj_,j)=>{
+              if(i===j){
+                html+=`<td style="background:var(--bg4);font-weight:700;color:var(--text)">1.000</td>`;
+              } else {
+                const r=pearson(qi_.vals,qj_.vals);
+                const p=pR(r,n);
+                const col=Math.abs(r)>=.6?'var(--green)':Math.abs(r)>=.3?'var(--accent)':'var(--text3)';
+                const sl=p<.001?'***':p<.01?'**':p<.05?'*':'ns';
+                html+=`<td><span style="font-weight:700;color:${col}">${r.toFixed(3)}</span><br><small style="color:var(--text3)">${sl}</small></td>`;
+              }
+            });
+            html+=`</tr>`;
+          });
+          html+=`</tbody></table></div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">*** p&lt;0.001 | ** p&lt;0.01 | * p&lt;0.05 | ns: غير دال</div>`;
+        }
+      }
+
+      html+=`</div></div>`;
     });
   });
 
