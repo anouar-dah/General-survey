@@ -2489,24 +2489,65 @@ function renderCorrelation(){
   }
   html+=`</div></div></div>`;
 
-  // ════ TAB 2: الأبعاد ════
+  // ════ TAB 2: الأبعاد — ارتباط كل بعد بأسئلته ════
   html+=`<div id="corr-dims" class="tc">`;
   const allDims=[];
   axes.forEach((ax,ai)=>(ax.dims||[]).forEach((dim,di)=>allDims.push({title:(dim.title||`بعد ${di+1}`).substring(0,22),vals:getDimVals(ai,di,comp),axTitle:ax.title})));
-  if(allDims.length>=2){
-    html+=`<div class="spss-section"><div class="spss-head"><div class="spss-head-title">🔗 مصفوفة ارتباط بيرسون — بين الأبعاد</div></div><div class="spss-body">`;
-    html+=_buildPearsonMatrix(allDims.map(d=>d.title),allDims.map(d=>d.vals),n);
-    html+=`<div style="margin-top:1rem;height:260px"><canvas id="c-corr-dims"></canvas></div>`;
-    html+=`</div></div>`;
-    // Per-axis dims matrix
-    axes.forEach((ax,ai)=>{
-      const axisDims=(ax.dims||[]).map((dim,di)=>({title:(dim.title||`بعد ${di+1}`).substring(0,22),vals:getDimVals(ai,di,comp)})).filter(d=>d.vals.length>=2);
-      if(axisDims.length<2) return;
-      html+=`<div class="spss-section" style="margin-top:1rem"><div class="spss-head"><div class="spss-head-title">🔗 ارتباط أبعاد المحور: ${ax.title}</div></div><div class="spss-body">`;
-      html+=_buildPearsonMatrix(axisDims.map(d=>d.title),axisDims.map(d=>d.vals),n);
-      html+=`</div></div>`;
+
+  // لكل محور: لكل بعد → جدول ارتباط البعد بأسئلته
+  axes.forEach((ax,ai)=>{
+    const axSym=(()=>{let xi3=0,yi3=0;let s='M'+(ai+1);axes.forEach((a2,ai2)=>{if(a2.variable==='X')xi3++;else if(a2.variable==='Y')yi3++;if(ai2===ai){if(a2.variable==='X')s='X'+xi3;else if(a2.variable==='Y')s='Y'+yi3;}});return s;})();
+    (ax.dims||[]).forEach((dim,di)=>{
+      const qs=dim.questions||[];
+      if(!qs.length) return;
+      const dimVals=getDimVals(ai,di,comp);
+      if(dimVals.length<2) return;
+      const qValsArr=qs.map((_,qi)=>getQVals(ai,di,qi,comp));
+      const qLabels=qs.map((_,qi)=>`${axSym}D${di+1}Q${qi+1}`);
+
+      html+=`<div class="spss-section" style="margin-bottom:1.25rem">
+        <div class="spss-head">
+          <div class="spss-head-title">🔗 ارتباط البعد بأسئلته — ${dim.title||'بعد '+(di+1)}</div>
+          <span class="badge ${ax.variable==='X'?'b-blue':ax.variable==='Y'?'b-red':'b-amber'}">${axSym} | ${ax.title}</span>
+        </div>
+        <div class="spss-body">
+          <div style="font-size:11.5px;color:var(--text2);margin-bottom:1rem;padding:.625rem 1rem;background:rgba(59,111,240,.04);border-radius:var(--r3);border-right:3px solid var(--accent)">
+            يُعبّر عن ارتباط درجة البعد الكلية بكل سؤال من أسئلته — كلما ارتفع r دلّ على انتماء السؤال للبعد.
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr>
+              <th>الرمز</th><th>نص السؤال</th>
+              <th>r (ارتباط بيرسون)</th><th>r²</th><th>Sig</th>
+              <th>الشدة</th><th>الحكم</th>
+            </tr></thead>
+            <tbody>`;
+      qs.forEach((q,qi)=>{
+        const qv=qValsArr[qi];
+        if(!qv.length||!dimVals.length){
+          html+=`<tr><td style="font-weight:700;color:var(--accent)">${qLabels[qi]}</td><td style="text-align:right">${q.text}</td><td colspan="5" style="color:var(--text3)">—</td></tr>`;
+          return;
+        }
+        const r=pearson(qv,dimVals);
+        const p=pR(r,n);
+        const str=Math.abs(r)>=.7?'قوية':Math.abs(r)>=.5?'متوسطة':Math.abs(r)>=.3?'ضعيفة':'ضعيفة جداً';
+        const col=Math.abs(r)>=.6?'var(--green)':Math.abs(r)>=.3?'var(--accent)':'var(--red)';
+        html+=`<tr>
+          <td style="font-weight:700;color:var(--accent)">${qLabels[qi]}</td>
+          <td style="text-align:right;font-size:11.5px">${q.text}</td>
+          <td style="font-weight:700;color:${col}">${r.toFixed(3)}</td>
+          <td>${(r**2).toFixed(3)}</td>
+          <td>${pSig(p)}</td>
+          <td>${str}</td>
+          <td><span class="badge ${p<.05&&Math.abs(r)>=.3?'b-green':'b-red'}">${p<.05&&Math.abs(r)>=.3?'دالة ✓':'غير دالة ✗'}</span></td>
+        </tr>`;
+      });
+      html+=`</tbody></table></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:5px">*** p&lt;0.001 | ** p&lt;0.01 | * p&lt;0.05 | ns: غير دال | المصدر: من إعداد الباحث اعتماداً على نتائج SPSS.</div>
+      </div></div>`;
     });
-  }else{html+=`<div class="empty"><h3>يلزم بُعدَين على الأقل</h3></div>`;}
+  });
+
+  if(!allDims.length){html+=`<div class="empty"><h3>لا توجد أبعاد معرَّفة</h3></div>`;}
   html+=`</div>`;
 
   // ════ TAB 3: الأسئلة — مصفوفة ارتباط بيرسون بين جميع الأسئلة ════
@@ -2563,35 +2604,8 @@ function renderCorrelation(){
 
   cont.innerHTML=html;
 
-  // رسم مخطط الأبعاد
-  if(allDims.length>=2){
-    setTimeout(()=>{
-      if(charts['c-corr-dims'])charts['c-corr-dims'].destroy();
-      const ctx=document.getElementById('c-corr-dims')?.getContext('2d');
-      if(!ctx) return;
-      const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-      const COLS=['#3b6ff0','#7c3aed','#059669','#d97706','#0891b2','#dc2626'];
-      charts['c-corr-dims']=new Chart(ctx,{
-        type:'bar',
-        data:{
-          labels:allDims.map(d=>d.title),
-          datasets:allDims.slice(0,5).map((d,i)=>({
-            label:d.title,
-            data:allDims.map(d2=>parseFloat(pearson(d.vals,d2.vals).toFixed(3))),
-            backgroundColor:COLS[i%COLS.length]+'88',
-            borderColor:COLS[i%COLS.length],
-            borderWidth:1.5
-          }))
-        },
-        options:{responsive:true,maintainAspectRatio:false,
-          scales:{y:{min:-1,max:1,title:{display:true,text:'r',font:{family:'Tajawal'}},
-            ticks:{color:isDark?'#94a3c0':'#6b7280'}},
-            x:{ticks:{color:isDark?'#94a3c0':'#6b7280',font:{family:'Tajawal',size:9}}}},
-          plugins:{legend:{labels:{font:{family:'Tajawal',size:10},color:isDark?'#94a3c0':'#6b7280'}}}}
-      });
-    },100);
-  }
 }
+
 
 window.corrTab=(id,el)=>{
   document.querySelectorAll('#correlation-container .tc').forEach(t=>t.classList.remove('active'));
