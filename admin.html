@@ -305,18 +305,40 @@ tbody td { border-bottom: 1px solid var(--border) !important; }
   <div class="login-card">
     <div class="login-logo">📊</div>
     <div class="login-title">منصة الاستبيانات</div>
-    <div class="login-sub">لوحة تحكم الباحث</div>
-    <div class="login-field">
-      <span class="fi">👤</span>
-      <input type="text" id="l-user" placeholder="اسم المستخدم" autocomplete="username">
+    <div class="login-sub" id="login-mode-label">لوحة تحكم الباحث</div>
+
+    <!-- خطوة 1: إدخال Firebase Config (إذا لم يكن محفوظاً) -->
+    <div id="login-step-cfg" style="display:none">
+      <div style="font-size:12px;color:#94a3c0;margin-bottom:10px;text-align:right">
+        أدخل Firebase Config الخاص بمشروعك (من Firebase Console)
+      </div>
+      <textarea id="l-fb-cfg" rows="6"
+        style="width:100%;background:#1a2235;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#f1f5ff;font-family:monospace;font-size:11px;padding:10px;resize:none;direction:ltr"
+        placeholder='{ "apiKey": "...", "authDomain": "...", "databaseURL": "...", "projectId": "..." }'></textarea>
+      <button class="login-btn" onclick="saveCfgStep()" style="margin-top:10px">حفظ والمتابعة ←</button>
+      <div class="login-error" id="cfg-err">❌ تنسيق Config غير صحيح</div>
     </div>
-    <div class="login-field">
-      <span class="fi">🔑</span>
-      <input type="password" id="l-pass" placeholder="كلمة المرور" autocomplete="current-password">
+
+    <!-- خطوة 2: تسجيل الدخول / إنشاء حساب -->
+    <div id="login-step-auth">
+      <div class="login-field">
+        <span class="fi">👤</span>
+        <input type="text" id="l-user" placeholder="اسم المستخدم" autocomplete="username">
+      </div>
+      <div class="login-field">
+        <span class="fi">🔑</span>
+        <input type="password" id="l-pass" placeholder="كلمة المرور (6 أرقام على الأقل)" autocomplete="current-password">
+      </div>
+      <button class="login-btn" id="login-submit-btn">دخول</button>
+      <button class="login-btn" id="register-btn"
+        style="margin-top:8px;background:transparent;border:1px solid rgba(59,111,240,.4);color:var(--accent,#3b6ff0)"
+        onclick="switchToRegister()">إنشاء حساب جديد</button>
+      <div class="login-error" id="login-err">❌ خطأ في تسجيل الدخول</div>
+      <div style="margin-top:12px;text-align:center">
+        <span onclick="resetCfg()"
+          style="font-size:11px;color:#4b5878;cursor:pointer;text-decoration:underline">تغيير مشروع Firebase ⚙️</span>
+      </div>
     </div>
-    <button class="login-btn" id="login-submit-btn">الدخول إلى لوحة التحكم</button>
-    <div class="login-error" id="login-err">❌ بيانات الدخول غير صحيحة</div>
-    <div class="login-hint">الحساب الافتراضي: admin / admin123</div>
   </div>
 </div>
 
@@ -932,36 +954,86 @@ let db = null;
 let charts = {};
 
 // ══════════════════════════════════════════════════════
-//  AUTH
+//  AUTH — Firebase Auth
 // ══════════════════════════════════════════════════════
+let _isRegisterMode = false;
+
 function checkAuth(){
-  if (localStorage.getItem('admin_auth') === '1') {
-    document.getElementById('login-screen').classList.add('hidden');
-  }
+  // إذا Firebase config موجود → اعرض شاشة login Auth
+  // إذا لا → اعرض شاشة إدخال config أولاً
+  const hasCfg = !!localStorage.getItem('firebase_config');
+  document.getElementById('login-step-cfg').style.display  = hasCfg ? 'none' : 'block';
+  document.getElementById('login-step-auth').style.display = hasCfg ? 'block' : 'none';
 }
-window.doLogin = () => {
+
+window.saveCfgStep = () => {
+  let raw = document.getElementById('l-fb-cfg').value.trim();
+  // قبول كائن JS أو JSON
+  if (raw.startsWith('{') && !raw.includes('"apiKey"')) {
+    raw = raw.replace(/(\w+)\s*:/g,'"$1":').replace(/'/g,'"');
+  }
+  try {
+    JSON.parse(raw);
+    localStorage.setItem('firebase_config', raw);
+    document.getElementById('cfg-err').style.display = 'none';
+    document.getElementById('login-step-cfg').style.display = 'none';
+    document.getElementById('login-step-auth').style.display = 'block';
+    initFirebase();
+  } catch(e) {
+    document.getElementById('cfg-err').style.display = 'block';
+  }
+};
+
+window.resetCfg = () => {
+  localStorage.removeItem('firebase_config');
+  document.getElementById('login-step-cfg').style.display = 'block';
+  document.getElementById('login-step-auth').style.display = 'none';
+};
+
+window.switchToRegister = () => {
+  _isRegisterMode = !_isRegisterMode;
+  document.getElementById('login-mode-label').textContent = _isRegisterMode ? 'إنشاء حساب جديد' : 'لوحة تحكم الباحث';
+  document.getElementById('login-submit-btn').textContent = _isRegisterMode ? 'إنشاء الحساب' : 'دخول';
+  document.getElementById('register-btn').textContent = _isRegisterMode ? '← العودة للدخول' : 'إنشاء حساب جديد';
+  document.getElementById('login-err').style.display = 'none';
+};
+
+window.doLogin = async () => {
   const u = document.getElementById('l-user').value.trim();
   const p = document.getElementById('l-pass').value;
-  const storedPw = localStorage.getItem('admin_password') || 'admin123';
-  const storedUser = localStorage.getItem('admin_username') || 'admin';
-  if (u === storedUser && p === storedPw) {
-    localStorage.setItem('admin_auth', '1');
+  if (!u || !p) { document.getElementById('login-err').textContent = '❌ أدخل اسم المستخدم وكلمة المرور'; document.getElementById('login-err').style.display = 'block'; return; }
+  if (!window._fbAuth) { document.getElementById('login-err').textContent = '❌ Firebase غير متصل بعد، انتظر لحظة...'; document.getElementById('login-err').style.display = 'block'; return; }
+
+  document.getElementById('login-submit-btn').textContent = '⏳ جارٍ...';
+  document.getElementById('login-submit-btn').disabled = true;
+
+  const fn = _isRegisterMode ? window.fbRegister : window.fbLogin;
+  const result = await fn(u, p);
+
+  document.getElementById('login-submit-btn').disabled = false;
+  document.getElementById('login-submit-btn').textContent = _isRegisterMode ? 'إنشاء الحساب' : 'دخول';
+
+  if (result.ok) {
     document.getElementById('login-screen').classList.add('hidden');
-    toast('مرحباً بك! 👋', 'ok');
+    toast(_isRegisterMode ? '✅ تم إنشاء حسابك بنجاح! 🎉' : 'مرحباً بك! 👋', 'ok');
   } else {
+    let msg = result.msg || 'خطأ غير معروف';
+    if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) msg = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+    if (msg.includes('email-already-in-use')) msg = 'هذا الاسم مستخدم بالفعل، جرّب اسماً آخر';
+    if (msg.includes('weak-password')) msg = 'كلمة المرور قصيرة جداً (6 أحرف على الأقل)';
+    document.getElementById('login-err').textContent = '❌ ' + msg;
     document.getElementById('login-err').style.display = 'block';
   }
 };
-window.logout = () => {
-  localStorage.removeItem('admin_auth');
+
+window.logout = async () => {
+  if (window._fbAuth) await window._fbAuth.signOut(window._fbAuth.auth).catch(()=>{});
+  currentUid = null;
   location.reload();
 };
+
 window.changePassword = () => {
-  const n = document.getElementById('pw-new').value;
-  const c = document.getElementById('pw-confirm').value;
-  if (!n || n !== c) { toast('كلمتا المرور غير متطابقتين','err'); return; }
-  localStorage.setItem('admin_password', n);
-  toast('✅ تم تغيير كلمة المرور','ok');
+  toast('لتغيير كلمة المرور استخدم Firebase Console → Authentication','ok');
 };
 
 // ══════════════════════════════════════════════════════
@@ -1011,80 +1083,64 @@ window.stab = (id, el, group) => {
 };
 
 // ══════════════════════════════════════════════════════
-//  FIREBASE CONFIG — مضمّن مباشرة
+//  FIREBASE CONFIG — يُقرأ من localStorage فقط
+//  لا يوجد config ثابت هنا — كل باحث يحفظ إعداداته الخاصة
 // ══════════════════════════════════════════════════════
-const FIREBASE_CFG = {
-  apiKey: "AIzaSyB5ivtHu4iNCz-F9HQXoSCT4j2UaG9_ICw",
-  authDomain: "survey-ai-project-3f4b8.firebaseapp.com",
-  databaseURL: "https://survey-ai-project-3f4b8-default-rtdb.firebaseio.com",
-  projectId: "survey-ai-project-3f4b8",
-  storageBucket: "survey-ai-project-3f4b8.firebasestorage.app",
-  messagingSenderId: "719850463901",
-  appId: "1:719850463901:web:465e26dd9974c70f082a74",
-  measurementId: "G-2HS5E941FP"
-};
-// احفظ دائماً في localStorage للتوافق مع الكود القديم
-localStorage.setItem('firebase_config', JSON.stringify(FIREBASE_CFG));
 
 // ══════════════════════════════════════════════════════
-//  FIREBASE INIT
+//  FIREBASE INIT — يقرأ config من localStorage فقط
+//  كل باحث له uid خاص → مساراته: researchers/{uid}/...
 // ══════════════════════════════════════════════════════
+let currentUid = null; // uid الباحث المسجّل دخوله
+
 async function initFirebase(){
-  try {
-    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { getDatabase, ref, push, set, get, onValue, remove } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-    const existing = getApps().find(a => a.name === 'admin-app');
-    const app = existing || initializeApp(FIREBASE_CFG, 'admin-app');
-    const database = getDatabase(app);
-    db = { ref, push, set, get, onValue, remove, db: database };
+  const cfgRaw = localStorage.getItem('firebase_config');
+  if (!cfgRaw) {
+    showFbWarning();
+    document.getElementById('db-label').textContent = 'لم يُعدّ بعد ⚙️';
+    return;
+  }
+  let cfg;
+  try { cfg = JSON.parse(cfgRaw); } catch(e) { toast('إعدادات Firebase تالفة','err'); return; }
 
-    // ── اقرأ survey من Firebase أولاً ──
-    try {
-      const surveySnap = await get(ref(database, 'survey'));
-      if (surveySnap.exists() && surveySnap.val()?.title) {
-        survey = surveySnap.val();
-        localStorage.setItem('survey_config', JSON.stringify(survey));
-        updateHeaderTitle();
-        toast('✅ تم تحميل الاستبيان من Firebase','ok');
-      } else if (survey) {
-        await set(ref(database, 'survey'), survey);
+  try {
+    const { initializeApp, getApps, deleteApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const { getDatabase, ref, push, set, get, onValue, remove } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+    const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut }
+      = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+
+    // أعد البناء دائماً عند تغيير الإعدادات
+    const old = getApps().find(a => a.name === 'admin-app');
+    if (old) await deleteApp(old);
+    const app = initializeApp(cfg, 'admin-app');
+    const database = getDatabase(app);
+    const auth = getAuth(app);
+
+    db = { ref, push, set, get, onValue, remove, db: database };
+    window._fbAuth = { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut };
+
+    // ── تابع حالة تسجيل الدخول ──
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        currentUid = user.uid;
+        localStorage.setItem('fb_uid', user.uid);
+        document.getElementById('db-dot').classList.add('on');
+        document.getElementById('db-label').textContent = 'متصل ✓';
+        hideFbWarning();
+        await _loadResearcherData();
+      } else {
+        currentUid = null;
+        localStorage.removeItem('fb_uid');
       }
-    } catch(e){
-      console.warn('Survey sync error:', e.message);
-      if(e.message && e.message.includes('PERMISSION_DENIED')){
-        toast('⚠️ Firebase: افتح Rules وضع ".read/.write": true','err');
-      }
+    });
+
+    // ── إذا كان مسجّلاً بالفعل جلب البيانات ──
+    if (auth.currentUser) {
+      currentUid = auth.currentUser.uid;
+      await _loadResearcherData();
     }
 
-    // ── استمع للاستجابات في الوقت الفعلي ──
-    onValue(ref(database, 'submissions'), snap => {
-      if (snap.exists()) {
-        const val = snap.val();
-        respondents = Object.entries(val).map(([k,v]) => ({ ...v, _id: k }));
-        respondents.sort((a,b) => new Date(b.submittedAt||0) - new Date(a.submittedAt||0));
-      } else respondents = [];
-      updateSbBadge();
-      if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
-      if (document.getElementById('page-responses').classList.contains('active')) renderResponses();
-    });
-
-    // ── استمع لتغييرات survey من أجهزة أخرى ──
-    onValue(ref(database, 'survey'), snap => {
-      if (snap.exists() && snap.val()?.title) {
-        const fbSurvey = snap.val();
-        if (JSON.stringify(fbSurvey) !== JSON.stringify(survey)) {
-          survey = fbSurvey;
-          localStorage.setItem('survey_config', JSON.stringify(survey));
-          updateHeaderTitle();
-        }
-      }
-    });
-
-    document.getElementById('db-dot').classList.add('on');
-    document.getElementById('db-label').textContent = 'متصل ✓';
-    console.log('Firebase connected successfully');
-
-    // ── اختبار الكتابة والقراءة تلقائياً ──
+    // ── اختبار الاتصال ──
     try {
       await set(ref(database, '_ping'), { t: Date.now() });
       document.getElementById('db-label').textContent = 'متصل ✓ قراءة/كتابة';
@@ -1101,6 +1157,75 @@ async function initFirebase(){
     showFbWarning();
   }
 }
+
+// جلب بيانات الباحث بعد تسجيل الدخول
+async function _loadResearcherData(){
+  if (!db || !currentUid) return;
+  const base = `researchers/${currentUid}`;
+
+  // اقرأ survey
+  try {
+    const surveySnap = await db.get(db.ref(db.db, `${base}/survey`));
+    if (surveySnap.exists() && surveySnap.val()?.title) {
+      survey = surveySnap.val();
+      localStorage.setItem('survey_config', JSON.stringify(survey));
+      updateHeaderTitle();
+      toast('✅ تم تحميل الاستبيان من Firebase','ok');
+    } else if (survey) {
+      await db.set(db.ref(db.db, `${base}/survey`), survey);
+    }
+  } catch(e){ console.warn('Survey sync error:', e.message); }
+
+  // استمع للاستجابات
+  db.onValue(db.ref(db.db, `${base}/submissions`), snap => {
+    if (snap.exists()) {
+      const val = snap.val();
+      respondents = Object.entries(val).map(([k,v]) => ({ ...v, _id: k }));
+      respondents.sort((a,b) => new Date(b.submittedAt||0) - new Date(a.submittedAt||0));
+    } else respondents = [];
+    updateSbBadge();
+    if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    if (document.getElementById('page-responses').classList.contains('active')) renderResponses();
+  });
+
+  // استمع لتغييرات survey
+  db.onValue(db.ref(db.db, `${base}/survey`), snap => {
+    if (snap.exists() && snap.val()?.title) {
+      const fbSurvey = snap.val();
+      if (JSON.stringify(fbSurvey) !== JSON.stringify(survey)) {
+        survey = fbSurvey;
+        localStorage.setItem('survey_config', JSON.stringify(survey));
+        updateHeaderTitle();
+      }
+    }
+  });
+}
+
+// ── تسجيل الدخول بـ Firebase Auth ──
+window.fbLogin = async (username, password) => {
+  const cfg = JSON.parse(localStorage.getItem('firebase_config') || '{}');
+  const domain = cfg.authDomain || cfg.projectId + '.firebaseapp.com';
+  const email = username.includes('@') ? username : `${username}@${domain}`;
+  try {
+    await window._fbAuth.signInWithEmailAndPassword(window._fbAuth.auth, email, password);
+    return { ok: true };
+  } catch(e) {
+    return { ok: false, msg: e.message };
+  }
+};
+
+// ── إنشاء حساب جديد ──
+window.fbRegister = async (username, password) => {
+  const cfg = JSON.parse(localStorage.getItem('firebase_config') || '{}');
+  const domain = cfg.authDomain || cfg.projectId + '.firebaseapp.com';
+  const email = username.includes('@') ? username : `${username}@${domain}`;
+  try {
+    await window._fbAuth.createUserWithEmailAndPassword(window._fbAuth.auth, email, password);
+    return { ok: true };
+  } catch(e) {
+    return { ok: false, msg: e.message };
+  }
+};
 
 function showFbWarning(){
   const banner = document.getElementById('fb-rules-banner');
@@ -1181,9 +1306,9 @@ window.saveSurvey = async () => {
   if (!survey) { toast('لا يوجد استبيان للحفظ','err'); return; }
   flushBuilderInputs();
   saveSurveyLocal();
-  if (db) {
+  if (db && currentUid) {
     try {
-      await db.set(db.ref(db.db, 'survey'), survey);
+      await db.set(db.ref(db.db, `researchers/${currentUid}/survey`), survey);
       toast('✅ تم حفظ الاستبيان وزامنته مع Firebase','ok');
     } catch(e){
       toast('✅ تم حفظ محلياً (Firebase غير متصل)','ok');
@@ -1892,7 +2017,8 @@ window.previewSurvey = ()=>{ flushBuilderInputs(); saveSurveyLocal(); window.ope
 //  SHARE
 // ══════════════════════════════════════════════════════
 function renderShare(){
-  const link = location.origin + location.pathname.replace('admin.html','index.html');
+  const base = location.origin + location.pathname.replace('admin.html','index.html');
+  const link = currentUid ? `${base}?r=${currentUid}` : base;
   document.getElementById('survey-link').value = link;
   if (survey) {
     document.getElementById('share-start').value = survey.startDate||'';
@@ -4352,11 +4478,6 @@ async function init(){
   if(fbCfg && document.getElementById('fb-config'))
     document.getElementById('fb-config').value = fbCfg;
 
-  // Auto-embed Firebase config if missing
-  if(!fbCfg) {
-    try { autoFillFirebase(); } catch(e){}
-  }
-
   // Initialize AI provider UI
   try { selectProvider(localStorage.getItem('ai_provider')||'gemini'); } catch(e){}
 
@@ -4375,8 +4496,10 @@ init();
 document.addEventListener('DOMContentLoaded', function(){
   const submitBtn = document.getElementById('login-submit-btn');
   const passInp   = document.getElementById('l-pass');
+  const userInp   = document.getElementById('l-user');
   if(submitBtn) submitBtn.addEventListener('click', function(){ window.doLogin(); });
   if(passInp)   passInp.addEventListener('keydown', function(e){ if(e.key==='Enter') window.doLogin(); });
+  if(userInp)   userInp.addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('l-pass').focus(); });
 });
 </script>
 </body>
