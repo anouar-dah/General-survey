@@ -287,44 +287,43 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min
 
 <script>
 // ════════════════════════════════════════════
-//  FIREBASE CONFIG — مضمّن مباشرة (لا يحتاج إعداداً)
+//  RESEARCHER ID — من رابط الاستبيان ?r=uid
+//  لا يوجد Firebase config ثابت هنا
 // ════════════════════════════════════════════
-const FIREBASE_CFG = {
-  apiKey: "AIzaSyDx5IceBBJ6V1vV-uD32G5OC2P24Kq16Vc",
-  authDomain: "survey-2-26880.firebaseapp.com",
-  databaseURL: "https://survey-2-26880-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "survey-2-26880",
-  storageBucket: "survey-2-26880.firebasestorage.app",
-  messagingSenderId: "634738673187",
-  appId: "1:634738673187:web:9c13859e0d895b5ccb5396",
-  measurementId: "G-W59WLCPQCC"
-};
-// احفظ في localStorage للـ admin أيضاً
-localStorage.setItem('firebase_config', JSON.stringify(FIREBASE_CFG));
+const _researcherUid = new URLSearchParams(location.search).get('r') || null;
 
 let db = null;
 
 async function initFirebase() {
+  // اقرأ config من localStorage (يحفظه admin.html عند الإعداد)
+  const cfgRaw = localStorage.getItem('firebase_config');
+  if (!cfgRaw || !_researcherUid) {
+    console.warn('No Firebase config or researcher uid in URL');
+    return false;
+  }
+  let cfg;
+  try { cfg = JSON.parse(cfgRaw); } catch(e){ return false; }
+
   try {
     const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const { getDatabase, ref, push, set, get } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
     const appName = 'survey-index';
     const existing = getApps().find(a => a.name === appName);
-    const app = existing || initializeApp(FIREBASE_CFG, appName);
+    const app = existing || initializeApp(cfg, appName);
     const database = getDatabase(app);
     db = { ref, push, set, get, db: database };
 
-    // اقرأ survey من Firebase مباشرةً
+    // اقرأ survey من مسار الباحث
     try {
-      const snap = await get(ref(database, 'survey'));
+      const snap = await get(ref(database, `researchers/${_researcherUid}/survey`));
       if (snap.exists() && snap.val()?.title) {
         const fbSurvey = snap.val();
         localStorage.setItem('survey_config', JSON.stringify(fbSurvey));
         console.log('✅ Survey loaded from Firebase:', fbSurvey.title);
-        return true; // نجح
+        return true;
       }
     } catch(e) {
-      console.warn('Firebase read error (check Rules):', e.message);
+      console.warn('Firebase read error:', e.message);
     }
     return false;
   } catch(e) {
@@ -371,23 +370,6 @@ function loadSurvey(){
   if (!raw) return null;
   try { return JSON.parse(raw); } catch(e){ return null; }
 }
-
-// Firebase config مضمّن — يُحمَّل تلقائياً إذا لم يكن في localStorage
-(function embedFirebaseConfig(){
-  if (!localStorage.getItem('firebase_config')) {
-    const embeddedCfg = {
-      apiKey: "AIzaSyB5ivtHu4iNCz-F9HQXoSCT4j2UaG9_ICw",
-      authDomain: "survey-ai-project-3f4b8.firebaseapp.com",
-      databaseURL: "https://survey-ai-project-3f4b8-default-rtdb.firebaseio.com",
-      projectId: "survey-ai-project-3f4b8",
-      storageBucket: "survey-ai-project-3f4b8.firebasestorage.app",
-      messagingSenderId: "719850463901",
-      appId: "1:719850463901:web:465e26dd9974c70f082a74"
-    };
-    localStorage.setItem('firebase_config', JSON.stringify(embeddedCfg));
-    console.log('Firebase config embedded automatically');
-  }
-})();
 
 // ═══════════════════════════════════════
 //  SURVEY STATUS CHECK
@@ -764,7 +746,7 @@ async function submitSurvey(){
   if (db) {
     try {
       const { ref, push, set, get } = db;
-      await push(ref(db.db, 'submissions'), submission);
+      await push(ref(db.db, `researchers/${_researcherUid}/submissions`), submission);
       // احذف من offline بعد النجاح
       try {
         const ls = JSON.parse(localStorage.getItem('offline_submissions')||'[]');
@@ -819,6 +801,16 @@ async function init(){
   initTheme();
   const loadEl = document.getElementById('loading-screen');
   loadEl.style.display = 'flex';
+
+  // ── 0. تحقق من وجود uid الباحث في الرابط ──
+  if (!_researcherUid) {
+    loadEl.style.display = 'none';
+    const closedEl = document.getElementById('closed-screen');
+    closedEl.style.display = 'flex';
+    closedEl.querySelector('h2').textContent = 'رابط غير صحيح';
+    closedEl.querySelector('p').textContent = 'هذا الرابط لا يحتوي على معرّف الباحث. تأكد من نسخ الرابط الكامل من صفحة "مشاركة الاستبيان" في لوحة التحكم.';
+    return;
+  }
 
   // ── 1. جلب survey من Firebase مع timeout 8 ثوانٍ ──
   let fbLoaded = false;
