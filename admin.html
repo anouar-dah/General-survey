@@ -353,6 +353,10 @@ tbody td { border-bottom: 1px solid var(--border) !important; }
   </div>
   <div class="hdr-right">
     <div class="db-chip"><div class="db-dot" id="db-dot"></div><span id="db-label">غير متصل</span></div>
+    <div class="db-chip" id="user-chip" style="display:none;gap:7px">
+      <span style="font-size:15px">👤</span>
+      <span id="user-display-name" style="font-weight:600;color:var(--text)"></span>
+    </div>
     <button class="btn btn-ghost btn-icon" onclick="toggleTheme()" title="الوضع الليلي">🌙</button>
     <button class="btn btn-primary" onclick="showPage('builder')">+ بناء الاستبيان</button>
     <button class="btn btn-ghost" onclick="logout()">خروج</button>
@@ -525,58 +529,78 @@ tbody td { border-bottom: 1px solid var(--border) !important; }
 
 <!-- ─── IMPORT ─── -->
 <div class="page" id="page-import">
-  <div class="pg-hdr"><div><div class="pg-title">استيراد وإدارة البيانات</div><div class="pg-sub">استيراد JSON أو CSV · دمج الـ Offline · مزامنة Firebase</div></div></div>
-
-  <!-- استيراد ملف -->
-  <div class="card">
-    <div class="card-head"><div class="card-title">📤 استيراد ملف بيانات</div></div>
-    <div style="background:rgba(59,111,240,.05);border:1px solid rgba(59,111,240,.15);border-radius:var(--r2);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2)">
-      ادعم ملفات <strong>JSON</strong> (من تصدير هذا التطبيق) أو <strong>CSV</strong> (بيانات خام).
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
-      <input type="file" accept=".json,.csv" id="import-file"
-        style="flex:1;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--r3);background:var(--bg3);color:var(--text2);font-family:'Tajawal',sans-serif;font-size:13px;cursor:pointer">
-      <button class="btn btn-primary" onclick="importData()">📥 استيراد</button>
-    </div>
-    <div id="import-result" style="font-size:13px;color:var(--text2);min-height:24px"></div>
-    <div id="import-preview" style="margin-top:1rem"></div>
+  <div class="pg-hdr">
+    <div><div class="pg-title">📦 استيراد وإدارة البيانات</div>
+    <div class="pg-sub">استيراد بيانات · حذف استبيان · دمج مع Firebase</div></div>
   </div>
 
-  <!-- استيراد استبيان JSON -->
-  <div class="card">
-    <div class="card-head"><div class="card-title">🗂 استيراد بنية استبيان (survey_config)</div></div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem">إذا كان لديك ملف JSON لبنية استبيان من جهاز آخر، يمكنك رفعه هنا لاستعادته.</div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+  <!-- ① حذف الاستبيان -->
+  <div class="card" style="border-right:4px solid var(--red)">
+    <div class="card-head">
+      <div><div class="card-title">🗑 حذف الاستبيان</div>
+      <div class="card-sub">يحذف بنية الاستبيان من Firebase ومن الجهاز نهائياً</div></div>
+    </div>
+    <div id="delete-survey-info" style="font-size:13px;color:var(--text2);margin-bottom:1rem;padding:10px 14px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:var(--r2)">
+      جارٍ التحقق...
+    </div>
+    <button class="btn btn-danger" onclick="confirmDeleteSurvey()">🗑 حذف الاستبيان نهائياً</button>
+    <div id="delete-survey-result" style="margin-top:8px;font-size:13px"></div>
+  </div>
+
+  <!-- ② استيراد بنية استبيان -->
+  <div class="card" style="border-right:4px solid var(--purple)">
+    <div class="card-head">
+      <div><div class="card-title">🗂 استيراد بنية استبيان</div>
+      <div class="card-sub">رفع ملف JSON لبنية الاستبيان مع مراجعة قبل الرفع لـ Firebase</div></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
       <input type="file" accept=".json" id="import-survey-file"
         style="flex:1;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--r3);background:var(--bg3);color:var(--text2);font-family:'Tajawal',sans-serif;font-size:13px;cursor:pointer">
-      <button class="btn btn-success" onclick="importSurveyConfig()">📋 استيراد الاستبيان</button>
+      <button class="btn btn-ghost" onclick="previewSurveyImport()">👁 معاينة</button>
+    </div>
+    <div id="survey-import-preview" style="display:none;margin-bottom:1rem;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);font-size:12px"></div>
+    <div style="display:flex;gap:8px" id="survey-import-actions" style="display:none">
+      <button class="btn btn-success" id="btn-upload-survey" onclick="uploadSurveyImport()" disabled>⬆️ رفع إلى Firebase</button>
+      <button class="btn btn-ghost" id="btn-save-survey-local" onclick="saveSurveyImportLocal()" disabled>💾 حفظ محلياً فقط</button>
     </div>
     <div id="survey-import-result" style="margin-top:8px;font-size:13px"></div>
   </div>
 
-  <!-- بيانات Offline -->
-  <div class="card">
+  <!-- ③ استيراد ملف بيانات (إجابات) -->
+  <div class="card" style="border-right:4px solid var(--accent)">
     <div class="card-head">
-      <div><div class="card-title">💾 البيانات المحفوظة محلياً (Offline)</div><div class="card-sub" id="offline-count-label">جارٍ التحقق...</div></div>
+      <div><div class="card-title">📤 استيراد ملف بيانات (إجابات)</div>
+      <div class="card-sub">JSON أو CSV — معاينة ثم دمج أو استبدال في Firebase</div></div>
     </div>
-    <div id="offline-list" style="max-height:300px;overflow-y:auto;margin-bottom:1rem"></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
+      <input type="file" accept=".json,.csv" id="import-file"
+        style="flex:1;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--r3);background:var(--bg3);color:var(--text2);font-family:'Tajawal',sans-serif;font-size:13px;cursor:pointer">
+      <button class="btn btn-ghost" onclick="previewDataImport()">👁 معاينة</button>
+    </div>
+    <div id="import-preview" style="display:none;margin-bottom:1rem;overflow-x:auto;border-radius:var(--r2);border:1px solid var(--border)"></div>
+    <div id="import-result" style="font-size:13px;color:var(--text2);min-height:24px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="import-actions">
+      <button class="btn btn-success" id="btn-merge-data" onclick="mergeDataImport()" disabled>🔀 دمج مع Firebase</button>
+      <button class="btn btn-danger" id="btn-replace-data" onclick="replaceDataImport()" disabled>♻️ استبدال في Firebase</button>
+    </div>
+    <div id="import-action-result" style="margin-top:8px;font-size:13px"></div>
+  </div>
+
+  <!-- ④ البيانات المحلية Offline -->
+  <div class="card" style="border-right:4px solid var(--teal)">
+    <div class="card-head">
+      <div><div class="card-title">💾 البيانات المحفوظة محلياً (Offline)</div>
+      <div class="card-sub" id="offline-count-label">جارٍ التحقق...</div></div>
+      <button class="btn btn-ghost" onclick="renderImport()">🔄 تحديث</button>
+    </div>
+    <div id="offline-list" style="max-height:240px;overflow-y:auto;margin-bottom:1rem"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-success" onclick="mergeOffline()">🔀 دمج مع Firebase</button>
       <button class="btn btn-danger" onclick="clearOffline()">🗑 مسح المحلي</button>
-      <button class="btn btn-ghost" onclick="renderImport()">🔄 تحديث</button>
     </div>
     <div id="merge-result" style="margin-top:8px;font-size:13px"></div>
   </div>
 
-  <!-- مزامنة Firebase -->
-  <div class="card">
-    <div class="card-head"><div class="card-title">🔥 مزامنة Firebase</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="forceSyncFromFirebase()">⬇️ جلب من Firebase</button>
-      <button class="btn btn-ghost" onclick="forcePushToFirebase()">⬆️ رفع إلى Firebase</button>
-    </div>
-    <div id="sync-result" style="margin-top:8px;font-size:13px;color:var(--text2)"></div>
-  </div>
   <span id="offline-count" style="display:none">0</span>
 </div>
 
@@ -1124,6 +1148,12 @@ async function initFirebase(){
       if (user) {
         currentUid = user.uid;
         localStorage.setItem('fb_uid', user.uid);
+        // عرض اسم المستخدم في الهيدر
+        const uname = (user.email || '').split('@')[0];
+        const chip = document.getElementById('user-chip');
+        const nameEl = document.getElementById('user-display-name');
+        if (chip) chip.style.display = 'flex';
+        if (nameEl) nameEl.textContent = uname;
         document.getElementById('db-dot').classList.add('on');
         document.getElementById('db-label').textContent = 'متصل ✓';
         hideFbWarning();
@@ -1131,6 +1161,8 @@ async function initFirebase(){
       } else {
         currentUid = null;
         localStorage.removeItem('fb_uid');
+        const chip = document.getElementById('user-chip');
+        if (chip) chip.style.display = 'none';
       }
     });
 
@@ -2055,6 +2087,13 @@ window.setSurveyStatus = s => {
 //  IMPORT
 // ══════════════════════════════════════════════════════
 function renderImport(){
+  // تحديث معلومات الاستبيان الحالي
+  const infoEl = document.getElementById('delete-survey-info');
+  if(infoEl){
+    if(survey) infoEl.innerHTML = `<strong>${survey.title||'بدون عنوان'}</strong> — ${(survey.axes||[]).length} محاور · ${(survey.personalFields||[]).length} حقل شخصي`;
+    else infoEl.textContent = 'لا يوجد استبيان حالياً.';
+  }
+  // offline
   const ls = JSON.parse(localStorage.getItem('offline_submissions')||'[]');
   const cnt = document.getElementById('offline-count');
   if(cnt) cnt.textContent = ls.length;
@@ -2062,9 +2101,9 @@ function renderImport(){
   if(lbl) lbl.textContent = `${ls.length} سجل محفوظ محلياً`;
   const listEl = document.getElementById('offline-list');
   if(listEl){
-    if(!ls.length){listEl.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:1rem">لا توجد بيانات offline</div>';}
+    if(!ls.length){ listEl.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:1rem">لا توجد بيانات offline</div>'; }
     else {
-      listEl.innerHTML=ls.map((r,i)=>`
+      listEl.innerHTML = ls.map((r,i)=>`
         <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--r3);margin-bottom:5px;font-size:12px;border:1px solid var(--border)">
           <div style="width:22px;height:22px;border-radius:50%;background:rgba(59,111,240,.1);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
           <div style="flex:1">
@@ -2076,9 +2115,102 @@ function renderImport(){
   }
 }
 
-window.importData = () => {
+// ─── حذف الاستبيان ───
+window.confirmDeleteSurvey = () => {
+  openModal('تأكيد الحذف', 'هل تريد حذف الاستبيان نهائياً من Firebase ومن الجهاز؟ لا يمكن التراجع.', async () => {
+    const resultEl = document.getElementById('delete-survey-result');
+    try {
+      if(db && currentUid){
+        await db.set(db.ref(db.db, `researchers/${currentUid}/survey`), null);
+      }
+      survey = null;
+      localStorage.removeItem('survey_config');
+      updateHeaderTitle();
+      renderImport();
+      if(resultEl) resultEl.innerHTML='<span style="color:var(--green)">✅ تم حذف الاستبيان بنجاح</span>';
+      toast('✅ تم حذف الاستبيان','ok');
+    } catch(e){
+      if(resultEl) resultEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;
+    }
+  });
+};
+
+// ─── معاينة بنية استبيان قبل الرفع ───
+let _pendingSurveyImport = null;
+window.previewSurveyImport = () => {
+  const f = document.getElementById('import-survey-file')?.files?.[0];
+  if(!f){ toast('اختر ملف JSON أولاً','err'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const s = parsed.survey || parsed;
+      if(!s.title && !s.axes){ toast('الملف لا يحتوي على بنية استبيان صالحة','err'); return; }
+      _pendingSurveyImport = s;
+      const axes = s.axes||[];
+      const totalQ = axes.reduce((a,ax)=>(ax.dims||[]).reduce((b,d)=>b+(d.questions||[]).length,a),0);
+      const prev = document.getElementById('survey-import-preview');
+      prev.style.display = 'block';
+      prev.innerHTML = `
+        <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px">📋 معاينة الاستبيان</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+          <div style="padding:8px;background:var(--bg2);border-radius:var(--r3);text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--accent)">${axes.length}</div>
+            <div style="font-size:10px;color:var(--text3)">محاور</div>
+          </div>
+          <div style="padding:8px;background:var(--bg2);border-radius:var(--r3);text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--purple)">${totalQ}</div>
+            <div style="font-size:10px;color:var(--text3)">سؤال</div>
+          </div>
+          <div style="padding:8px;background:var(--bg2);border-radius:var(--r3);text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--teal)">${(s.personalFields||[]).length}</div>
+            <div style="font-size:10px;color:var(--text3)">حقل شخصي</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text2)"><strong>العنوان:</strong> ${s.title||'—'}</div>
+        ${s.description?`<div style="font-size:12px;color:var(--text3);margin-top:4px">${s.description}</div>`:''}
+        <div style="margin-top:8px;font-size:11px;color:var(--text3)">${axes.map(ax=>`• ${ax.title}`).join(' &nbsp;')}</div>`;
+      document.getElementById('btn-upload-survey').disabled = false;
+      document.getElementById('btn-save-survey-local').disabled = false;
+      document.getElementById('survey-import-actions').style.display = 'flex';
+      toast('✅ معاينة جاهزة','ok');
+    } catch(e){ toast('خطأ في تحليل الملف: '+e.message,'err'); }
+  };
+  reader.readAsText(f,'utf-8');
+};
+
+window.uploadSurveyImport = async () => {
+  if(!_pendingSurveyImport){ toast('لا يوجد استبيان للرفع','err'); return; }
+  if(!db||!currentUid){ toast('Firebase غير متصل أو لم تسجّل دخولك','err'); return; }
+  try {
+    survey = _pendingSurveyImport;
+    localStorage.setItem('survey_config', JSON.stringify(survey));
+    await db.set(db.ref(db.db, `researchers/${currentUid}/survey`), survey);
+    updateHeaderTitle();
+    renderImport();
+    document.getElementById('survey-import-result').innerHTML='<span style="color:var(--green)">✅ تم رفع الاستبيان إلى Firebase بنجاح</span>';
+    toast('✅ تم رفع الاستبيان','ok');
+    _pendingSurveyImport = null;
+  } catch(e){
+    document.getElementById('survey-import-result').innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;
+  }
+};
+
+window.saveSurveyImportLocal = () => {
+  if(!_pendingSurveyImport){ toast('لا يوجد استبيان','err'); return; }
+  survey = _pendingSurveyImport;
+  localStorage.setItem('survey_config', JSON.stringify(survey));
+  updateHeaderTitle();
+  renderImport();
+  document.getElementById('survey-import-result').innerHTML='<span style="color:var(--green)">✅ تم حفظ الاستبيان محلياً (لم يُرفع لـ Firebase بعد)</span>';
+  toast('✅ تم الحفظ محلياً','ok');
+};
+
+// ─── معاينة ملف البيانات ───
+let _pendingDataImport = [];
+window.previewDataImport = () => {
   const f = document.getElementById('import-file')?.files?.[0];
-  if(!f){toast('اختر ملفاً','err');return;}
+  if(!f){ toast('اختر ملفاً أولاً','err'); return; }
   const resultEl = document.getElementById('import-result');
   const previewEl = document.getElementById('import-preview');
   if(resultEl) resultEl.innerHTML = '⏳ جارٍ التحليل...';
@@ -2088,83 +2220,117 @@ window.importData = () => {
       let data = [];
       if(f.name.endsWith('.json')){
         const parsed = JSON.parse(e.target.result);
-        // دعم ثلاثة أشكال: مصفوفة · {respondents:[...]} · {submissions:{...}}
         if(Array.isArray(parsed)) data = parsed;
         else if(parsed.respondents) data = parsed.respondents;
         else if(parsed.submissions) data = Object.values(parsed.submissions);
-        else if(parsed.answers) data = [parsed]; // سجل واحد
+        else if(parsed.answers) data = [parsed];
         else data = Object.values(parsed);
       } else {
-        // CSV: السطر الأول هو العناوين
         const lines = e.target.result.split(/\r?\n/).filter(Boolean);
-        if(lines.length < 2){toast('CSV فارغ أو غير صالح','err');return;}
+        if(lines.length < 2){ toast('CSV فارغ أو غير صالح','err'); return; }
         const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
         data = lines.slice(1).map(row=>{
           const vals = row.split(',').map(v=>v.replace(/^"|"$/g,'').trim());
-          const obj = {answers:{}};
-          headers.forEach((h,i)=>{ obj[h]=vals[i]||''; });
+          const obj = { answers:{} };
+          headers.forEach((h,i)=>{ obj[h] = vals[i]||''; });
           return obj;
         });
       }
       data = data.filter(r => r && typeof r === 'object');
-      if(!data.length){toast('لم يُعثر على بيانات صالحة في الملف','err');return;}
-      let added=0;
-      data.forEach(r=>{
-        if(!respondents.find(x=>x.submittedAt&&x.submittedAt===r.submittedAt)){
-          respondents.push({...r,_source:'imported'});added++;
-        }
-      });
-      if(resultEl) resultEl.innerHTML=`<span style="color:var(--green)">✅ تم استيراد ${added} سجل جديد (${data.length-added} مكرر تم تجاهله)</span>`;
-      // preview
-      if(previewEl) previewEl.innerHTML=`<div style="font-size:11px;color:var(--text3);margin-top:8px">عينة البيانات (أول 3 سجلات):</div>
-        <div style="overflow-x:auto;margin-top:6px"><table style="font-size:11px;min-width:100%">
-          <thead><tr>${Object.keys(data[0]).slice(0,6).map(k=>`<th style="padding:4px 8px;background:var(--bg3)">${k}</th>`).join('')}</tr></thead>
-          <tbody>${data.slice(0,3).map(r=>`<tr>${Object.values(r).slice(0,6).map(v=>`<td style="padding:4px 8px">${String(v||'').substring(0,30)}</td>`).join('')}</tr>`).join('')}
+      if(!data.length){ toast('لم يُعثر على بيانات صالحة','err'); return; }
+      _pendingDataImport = data;
+
+      // جدول المعاينة
+      const cols = Object.keys(data[0]).slice(0,6);
+      previewEl.style.display = 'block';
+      previewEl.innerHTML = `
+        <div style="padding:8px 12px;background:var(--bg3);font-size:12px;font-weight:700;color:var(--text2)">
+          ${data.length} سجل جاهز للاستيراد — معاينة أول 5:
+        </div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr>${cols.map(k=>`<th>${k}</th>`).join('')}</tr></thead>
+          <tbody>${data.slice(0,5).map(r=>`<tr>${cols.map(c=>`<td>${String(r[c]||'').substring(0,25)}</td>`).join('')}</tr>`).join('')}
           </tbody></table></div>`;
-      toast(`✅ استيراد ${added} سجل`,'ok');
-      updateSbBadge();
+
+      if(resultEl) resultEl.innerHTML=`<span style="color:var(--accent)">📊 ${data.length} سجل — اختر طريقة الاستيراد:</span>`;
+      document.getElementById('btn-merge-data').disabled = false;
+      document.getElementById('btn-replace-data').disabled = false;
+      toast(`✅ ${data.length} سجل جاهز`,'ok');
     } catch(err){
-      if(resultEl) resultEl.innerHTML=`<span style="color:var(--red)">❌ خطأ: ${err.message}</span>`;
+      if(resultEl) resultEl.innerHTML=`<span style="color:var(--red)">❌ ${err.message}</span>`;
       toast('خطأ في تحليل الملف','err');
     }
   };
   reader.readAsText(f,'utf-8');
 };
 
-window.importSurveyConfig = () => {
-  const f = document.getElementById('import-survey-file')?.files?.[0];
-  if(!f){toast('اختر ملف JSON للاستبيان','err');return;}
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      const s = parsed.survey || parsed;
-      if(!s.title && !s.axes){toast('الملف لا يحتوي على بنية استبيان صالحة','err');return;}
-      survey = s;
-      saveSurveyLocal();
-      document.getElementById('survey-import-result').innerHTML='<span style="color:var(--green)">✅ تم استيراد بنية الاستبيان. اذهب إلى "بناء الاستبيان" للمراجعة.</span>';
-      updateHeaderTitle();
-      toast('✅ تم استيراد الاستبيان','ok');
-    } catch(e){toast('خطأ في تحليل الملف: '+e.message,'err');}
-  };
-  reader.readAsText(f,'utf-8');
+// دمج مع Firebase (إضافة فوق الموجود)
+window.mergeDataImport = async () => {
+  if(!_pendingDataImport.length){ toast('لا يوجد بيانات للدمج','err'); return; }
+  if(!db||!currentUid){ toast('Firebase غير متصل','err'); return; }
+  const actionEl = document.getElementById('import-action-result');
+  if(actionEl) actionEl.innerHTML = '⏳ جارٍ الدمج...';
+  try {
+    let added = 0;
+    for(const r of _pendingDataImport){
+      const clean = {...r}; delete clean._id; delete clean._source;
+      await db.push(db.ref(db.db, `researchers/${currentUid}/submissions`), clean);
+      added++;
+    }
+    if(actionEl) actionEl.innerHTML=`<span style="color:var(--green)">✅ تم دمج ${added} سجل مع Firebase بنجاح</span>`;
+    toast(`✅ دمج ${added} سجل`,'ok');
+    _pendingDataImport = [];
+    document.getElementById('btn-merge-data').disabled = true;
+    document.getElementById('btn-replace-data').disabled = true;
+    updateSbBadge();
+  } catch(e){
+    if(actionEl) actionEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;
+  }
+};
+
+// استبدال في Firebase (حذف القديم + رفع الجديد)
+window.replaceDataImport = () => {
+  if(!_pendingDataImport.length){ toast('لا يوجد بيانات','err'); return; }
+  openModal('تأكيد الاستبدال',
+    `سيتم حذف جميع الإجابات الموجودة (${respondents.length} سجل) واستبدالها بـ ${_pendingDataImport.length} سجل جديد. هل أنت متأكد؟`,
+    async () => {
+      const actionEl = document.getElementById('import-action-result');
+      if(actionEl) actionEl.innerHTML = '⏳ جارٍ الاستبدال...';
+      try {
+        if(!db||!currentUid) throw new Error('Firebase غير متصل');
+        // احذف القديم
+        await db.set(db.ref(db.db, `researchers/${currentUid}/submissions`), null);
+        // ارفع الجديد
+        let added = 0;
+        for(const r of _pendingDataImport){
+          const clean = {...r}; delete clean._id; delete clean._source;
+          await db.push(db.ref(db.db, `researchers/${currentUid}/submissions`), clean);
+          added++;
+        }
+        if(actionEl) actionEl.innerHTML=`<span style="color:var(--green)">✅ تم استبدال البيانات — ${added} سجل جديد في Firebase</span>`;
+        toast(`✅ استبدال ${added} سجل`,'ok');
+        _pendingDataImport = [];
+        document.getElementById('btn-merge-data').disabled = true;
+        document.getElementById('btn-replace-data').disabled = true;
+        updateSbBadge();
+      } catch(e){
+        if(actionEl) actionEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;
+      }
+    }
+  );
 };
 
 window.mergeOffline = async () => {
   const ls = JSON.parse(localStorage.getItem('offline_submissions')||'[]');
   const resultEl = document.getElementById('merge-result');
-  if(!ls.length){toast('لا توجد بيانات محلية','err');return;}
-  if(!db){
-    toast('Firebase غير متصل — تأكد من إعداداته','err');
-    if(resultEl) resultEl.innerHTML='<span style="color:var(--red)">Firebase غير متصل</span>';
-    return;
-  }
+  if(!ls.length){ toast('لا توجد بيانات محلية','err'); return; }
+  if(!db||!currentUid){ toast('Firebase غير متصل','err'); return; }
   if(resultEl) resultEl.innerHTML='⏳ جارٍ الدمج...';
   try {
     let pushed=0;
     for(const r of ls){
       const clean={...r}; delete clean._source; delete clean._id;
-      await db.push(db.ref(db.db,'submissions'), clean);
+      await db.push(db.ref(db.db, `researchers/${currentUid}/submissions`), clean);
       pushed++;
     }
     localStorage.removeItem('offline_submissions');
@@ -2172,8 +2338,7 @@ window.mergeOffline = async () => {
     if(resultEl) resultEl.innerHTML=`<span style="color:var(--green)">✅ تم دمج ${pushed} سجل مع Firebase</span>`;
     toast(`✅ تم دمج ${pushed} سجل`,'ok');
   } catch(e){
-    if(resultEl) resultEl.innerHTML=`<span style="color:var(--red)">❌ فشل الدمج: ${e.message}</span>`;
-    toast('فشل الدمج','err');
+    if(resultEl) resultEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;
   }
 };
 
@@ -2183,33 +2348,31 @@ window.clearOffline = () => {
   toast('✅ تم مسح البيانات المحلية','ok');
 };
 
+// دوال المزامنة القديمة — محدّثة للمسار الجديد
 window.forceSyncFromFirebase = async () => {
-  const syncEl = document.getElementById('sync-result');
-  if(!db){toast('Firebase غير متصل','err');return;}
-  if(syncEl) syncEl.innerHTML='⏳ جارٍ الجلب من Firebase...';
+  if(!db||!currentUid){ toast('Firebase غير متصل','err'); return; }
   try {
-    const snap = await db.get(db.ref(db.db,'survey'));
+    const snap = await db.get(db.ref(db.db, `researchers/${currentUid}/survey`));
     if(snap.exists()&&snap.val()?.title){
-      survey=snap.val();
-      localStorage.setItem('survey_config',JSON.stringify(survey));
-      updateHeaderTitle();
-      if(syncEl) syncEl.innerHTML='<span style="color:var(--green)">✅ تم جلب الاستبيان من Firebase</span>';
-      toast('✅ تم جلب الاستبيان','ok');
-    } else {if(syncEl) syncEl.innerHTML='<span style="color:var(--amber)">⚠️ لا يوجد استبيان في Firebase</span>';}
-  } catch(e){if(syncEl)syncEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;}
+      survey=snap.val(); localStorage.setItem('survey_config',JSON.stringify(survey));
+      updateHeaderTitle(); renderImport();
+      toast('✅ تم جلب الاستبيان من Firebase','ok');
+    } else toast('⚠️ لا يوجد استبيان في Firebase','err');
+  } catch(e){ toast('❌ '+e.message,'err'); }
 };
 
 window.forcePushToFirebase = async () => {
-  const syncEl = document.getElementById('sync-result');
-  if(!db){toast('Firebase غير متصل','err');return;}
-  if(!survey){toast('لا يوجد استبيان للرفع','err');return;}
-  if(syncEl) syncEl.innerHTML='⏳ جارٍ الرفع إلى Firebase...';
+  if(!db||!currentUid){ toast('Firebase غير متصل','err'); return; }
+  if(!survey){ toast('لا يوجد استبيان للرفع','err'); return; }
   try {
-    await db.set(db.ref(db.db,'survey'),survey);
-    if(syncEl) syncEl.innerHTML='<span style="color:var(--green)">✅ تم رفع الاستبيان إلى Firebase</span>';
-    toast('✅ تم رفع الاستبيان','ok');
-  } catch(e){if(syncEl)syncEl.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`;}
+    await db.set(db.ref(db.db, `researchers/${currentUid}/survey`), survey);
+    toast('✅ تم رفع الاستبيان إلى Firebase','ok');
+  } catch(e){ toast('❌ '+e.message,'err'); }
 };
+
+// importData و importSurveyConfig للتوافق مع الكود القديم
+window.importData = window.previewDataImport;
+window.importSurveyConfig = window.previewSurveyImport;
 
 // ══════════════════════════════════════════════════════
 //  ANALYSIS - DESCRIPTIVE
